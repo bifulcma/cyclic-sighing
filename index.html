@@ -325,7 +325,7 @@
   <section class="sez" aria-labelledby="hCome">
     <h2 id="hCome">Come si fa</h2>
     <p>Immagina un'anfora. L'inspirazione riempie la pancia, il sorso arriva fino al collo,
-      l'espirazione la svuota piano dalla bocca. Un ciclo dura una decina di secondi e si ripete, senza pause.</p>
+      l'espirazione la svuota piano dalla bocca. Un ciclo dura una decina di secondi e riparte subito.</p>
     <ol class="passi">
       <li class="passo">
         <canvas class="passoAnfora" data-v=".62" width="160" height="160" aria-hidden="true"></canvas>
@@ -335,7 +335,7 @@
       <li class="passo">
         <canvas class="passoAnfora" data-v="1" width="160" height="160" aria-hidden="true"></canvas>
         <div><h3><span>2.</span> Ancora un sorso</h3>
-          <p>Subito dopo, senza fermarti, una seconda inspirazione breve dal naso: riempie fino in fondo.</p></div>
+          <p>Un attimo di pausa, poi una seconda inspirazione breve dal naso: riempie fino in fondo.</p></div>
       </li>
       <li class="passo">
         <canvas class="passoAnfora" data-v=".3" data-aria="1" width="160" height="160" aria-hidden="true"></canvas>
@@ -451,13 +451,16 @@ const VOCE_CICLI=3;           // la voce guida solo i primi cicli, poi silenzio
 const SCALA={min:.42,mid:.8,max:1}; // scala storica del volume: la usa il test numerico CURVA_OK
 const SILENZIO_MS=3000;
 const MIN_SEC_DIARIO=60;      // sotto il minuto la sessione non entra nel diario
-const SORSO_ANTICIPO=.35;     // testo, voce, click e spinta del sorso partono 0,35 s prima della fine nominale dell'inspiro
+const PAUSA_SORSO=.4;         // stacco (s) tra la fine dell'inspiro e il sorso: fermo, si vede e si sente. Si regola qui (0 = niente stacco)
+const QUOTA_NASO=.7;          // il primo respiro riempie il 70% dell'aria, il sorso il resto
 const SALITA=.4;              // quota dell'inspiro in cui il flusso d'aria arriva a regime
-const SPINTA=1;               // la campana del sorso: +56% di flusso sopra la tenuta, mai un calo prima della cima
+const FRENATA=.3;             // quota finale dell'inspiro in cui il flusso rallenta fino a fermarsi: entra nello stacco senza scatto
 const PREP=3.2;               // preparazione prima del primo ciclo (frase iniziale), fuori dal timer
 const DUCK=.3;                // mentre parla la voce i toni scendono a 0,3 (−10 dB)
 const MAX_ATTESA_VOCE=.8;     // una frase aspetta al massimo 0,8 s che finisca la precedente, poi si salta
-const AUDIO_BASE='https://raw.githubusercontent.com/bifulcma/cyclic-sighing/main/audio/';
+const ANTICIPO_AUDIO=.06;     // voce e click si programmano 60 ms prima sull'orologio audio: partono all'istante esatto del cue
+// voce fissata al commit 0afe6ee (ramo grok-design): lì «Ancora un sorso» è più rapido e sta nel sorso dopo lo stacco
+const AUDIO_BASE='https://raw.githubusercontent.com/bifulcma/cyclic-sighing/0afe6eef074fa7547ac2b88372b30b9d88c2115d/audio/';
 const FRASI=['intro','in','sorso','out','svuota','fine'];
 const NOMI_VOCE={isabella:'Isabella',elsa:'Elsa',alternate:'Isabella ed Elsa'};
 
@@ -482,7 +485,7 @@ const salva=()=>{
 };
 
 const $=id=>document.getElementById(id);
-const num=n=>String(n).replace('.',',');
+const num=n=>String(Math.round(n*100)/100).replace('.',',');
 const mmss=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
 const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const giorno=off=>{const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+off);return d;}; // mezzogiorno: niente sorprese col cambio ora
@@ -495,40 +498,49 @@ const f1=n=>n.toFixed(1);
 const IOS_SENZA_SESSIONE=/iP(hone|ad|od)/.test(navigator.userAgent||'')&&!('audioSession'in navigator);
 
 /* ─────────────── tempi e curva del respiro ─────────────── */
-const durCiclo=r=>r.in+r.sorso+r.out;
+// ciclo: inspiro → stacco (PAUSA_SORSO) → sorso → espiro
+const durCiclo=r=>r.in+PAUSA_SORSO+r.sorso+r.out;
 function piano(minuti,r){ // cicli interi: il timer finisce sempre a fine espirazione
  const L=durCiclo(r),n=Math.max(1,Math.round(minuti*60/L));
  return {cicli:n,totale:n*L};
 }
-// fasi nominali (il ritmo scelto); el<0 è la preparazione
+// istanti dentro il ciclo: fine inspiro (ti), inizio sorso (t2), cima (top)
+function geoCiclo(r){
+ const ti=r.in,t2=ti+PAUSA_SORSO,top=t2+r.sorso;
+ return {ti,t2,top,D:r.sorso,su:SALITA*r.in,giu:FRENATA*r.in};
+}
+// fasi del ritmo scelto; el<0 è la preparazione
 function faseA(el,r){
  if(el<0)return {ciclo:0,tc:0,fase:'prep',t:el+PREP,dur:PREP};
- const L=durCiclo(r),ciclo=Math.floor(el/L+1e-12),tc=el-ciclo*L;
- if(tc<r.in)return {ciclo,tc,fase:'in',t:tc,dur:r.in};
- if(tc<r.in+r.sorso)return {ciclo,tc,fase:'sorso',t:tc-r.in,dur:r.sorso};
- return {ciclo,tc,fase:'out',t:tc-r.in-r.sorso,dur:r.out};
+ const L=durCiclo(r),ciclo=Math.floor(el/L+1e-12),tc=el-ciclo*L,g=geoCiclo(r);
+ if(tc<g.ti)return {ciclo,tc,fase:'in',t:tc,dur:r.in};
+ if(tc<g.t2)return {ciclo,tc,fase:'stacco',t:tc-g.ti,dur:PAUSA_SORSO};
+ if(tc<g.top)return {ciclo,tc,fase:'sorso',t:tc-g.t2,dur:r.sorso};
+ return {ciclo,tc,fase:'out',t:tc-g.top,dur:r.out};
 }
-// fase mostrata e guidata: il sorso parte con SORSO_ANTICIPO, così chi ascolta ci arriva in tempo
-const faseUI=(tc,r)=>tc<r.in-SORSO_ANTICIPO?'in':tc<r.in+r.sorso?'sorso':'out';
-const cueCiclo=r=>[{k:'in',t:0},{k:'sorso',t:r.in-SORSO_ANTICIPO},{k:'out',t:r.in+r.sorso},{k:'svuota',t:r.in+r.sorso+r.out*.62}];
+// fase mostrata e guidata: coincide con quella del ritmo (il sorso parte quando finisce lo stacco)
+const faseUI=(tc,r)=>faseA(tc,r).fase;
+const cueCiclo=r=>{const g=geoCiclo(r);
+ return [{k:'in',t:0},{k:'sorso',t:g.t2},{k:'out',t:g.top},{k:'svuota',t:g.top+r.out*.62}];};
 
-// Volume d'aria 0→1→0 dentro il ciclo. Il flusso (la sua derivata) sale, tiene, e nel sorso riceve una spinta
-// che si spegne in cima: non cala MAI prima della cima, quindi tra inspiro e sorso non c'è nessun fermo.
-// Espirazione: flusso 12p(1−p)², parte morbida, scende lunga; tutte le giunture sono C1.
-const _S=x=>{x=clamp(x);return x*x*(3-2*x);};
+// Volume d'aria 0→1→0 dentro il ciclo.
+// Inspiro: il flusso sale morbido, tiene, poi rallenta fino a zero (arriva a QUOTA_NASO).
+// Stacco: volume fermo, flusso zero. Sorso: una campana di flusso sin² che parte e torna a zero.
+// Espirazione: flusso 12p(1−p)², parte morbida, scende lunga. Tutte le giunture sono C1: nessuno scatto.
 const _SI=x=>{x=clamp(x);return x*x*x-x*x*x*x/2;};                                  // ∫ smoothstep
 const _SIN2I=x=>{x=clamp(x);return x/2-Math.sin(2*Math.PI*x)/(4*Math.PI);};          // ∫ sin²(πu)
-function geoCiclo(r){
- const top=r.in+r.sorso,t2=r.in-SORSO_ANTICIPO,D=top-t2,tau=SALITA*r.in;
- return {top,t2,D,tau,tot:(t2-tau/2)+D/2+SPINTA*D/2};
-}
 function volumeCiclo(tc,r){
  const g=geoCiclo(r);
- if(tc>=g.top){const p=clamp((tc-g.top)/r.out);return Math.pow(1-p,3)*(1+3*p);}
  if(tc<=0)return 0;
- let a=tc<g.tau?g.tau*_SI(tc/g.tau):g.tau/2+(Math.min(tc,g.t2)-g.tau);
- if(tc>g.t2){const u=(tc-g.t2)/g.D;a+=g.D*(u-_SI(u))+SPINTA*g.D*_SIN2I(u);}
- return a/g.tot;
+ if(tc<g.ti){
+  const fr=g.ti-g.giu,tot=g.ti-(g.su+g.giu)/2;
+  let a=tc<g.su?g.su*_SI(tc/g.su):g.su/2+(Math.min(tc,fr)-g.su);
+  if(tc>fr){const u=(tc-fr)/g.giu;a+=g.giu*(u-_SI(u));}
+  return Math.min(QUOTA_NASO,QUOTA_NASO*a/tot);
+ }
+ if(tc<g.t2)return QUOTA_NASO;
+ if(tc<g.top)return QUOTA_NASO+(1-QUOTA_NASO)*2*_SIN2I((tc-g.t2)/g.D);
+ const p=clamp((tc-g.top)/r.out);return Math.pow(1-p,3)*(1+3*p);
 }
 function flussoCiclo(tc,r){const h=.004,L=durCiclo(r),w=t=>((t%L)+L)%L;
  return (volumeCiclo(w(tc+h),r)-volumeCiclo(w(tc-h),r))/(2*h);}
@@ -598,7 +610,10 @@ function disegnaCampo(cv,{V=0,q=0,t=0,sorso=0,fermo=false,fase=''}={}){
  ctx.strokeStyle=rgba(col,.32+.45*Vd);ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.stroke();
  if(sorso>0){ctx.strokeStyle=rgba(COL.paper,.22*sorso);ctx.beginPath();ctx.arc(cx,cy,R*(1.06+.08*sorso),0,Math.PI*2);ctx.stroke();}
 
- const qn=clamp(q/.45,-1,1),spin=rid||fermo?0:t*.11*qn,wob=rid||fermo?0:(.016+.048*Math.abs(qn));
+ // rotazione integrata nel tempo (velocità ∝ flusso): nello stacco si ferma e poi riparte senza scatti
+ const qn=clamp(q/.45,-1,1),giro=cv._giro||(cv._giro={a:t*.11*qn,t}),dt=t-giro.t;giro.t=t;
+ if(dt>0&&dt<.25)giro.a+=.11*qn*dt;
+ const spin=rid||fermo?0:giro.a,wob=rid||fermo?0:(.016+.048*Math.abs(qn));
  const pts=campoSeed(),sc=m/360;
  for(let i=0;i<pts.length;i++){
   const p=pts[i],breathe=Math.sin(t*1.35+p.ph)*wob,rr=R*p.u*(1+breathe)+m*.018,ang=p.th+spin;
@@ -644,7 +659,7 @@ function disegnaBinario(r){
   <path d="${d}" fill="none" stroke="#343C4D" stroke-width="1.6"/>
   <path d="${d}" fill="none" stroke="url(#binG)" stroke-width="2.4" stroke-linecap="round" clip-path="url(#binC)" filter="url(#binGlow)"/>
   <circle id="binPunto" r="3.6" cx="8" cy="62" fill="#D6FF4B" stroke="#08090F" stroke-width="1.5"/>
-  <text data-f="in" x="${f1(X(g.t2/2))}" y="78">naso</text>
+  <text data-f="in" x="${f1(X(g.ti/2))}" y="78">naso</text>
   <text data-f="sorso" x="${f1(X((g.t2+g.top)/2))}" y="78">sorso</text>
   <text data-f="out" x="${f1(X((g.top+L)/2))}" y="78">bocca</text>`;
  P.binX=X;P.binY=Y;
@@ -684,13 +699,17 @@ function impostaVolume(v){
  S.volume=clamp(v);
  try{const t=AU.ctx.currentTime;AU.master.gain.setTargetAtTime(S.volume*.88,t,.06);AU.voceBus.gain.setTargetAtTime(S.volume,t,.06);}catch(e){}
 }
-// Un tono UNICO per ciclo, con frequenza e volume programmati: nessun buco tra inspiro e sorso.
-const PICCO=.17;
+// Un tono UNICO per ciclo, con frequenza e volume programmati. Nello stacco resta sulla stessa nota e scende
+// a −20 dB: la pausa si sente, ma l'oscillatore non si spegne (niente click). Il sorso riparte dal click.
+const PICCO=.17,TONO_STACCO=.1;
+const crescenti=pts=>pts.filter((p,i)=>!i||p[0]>pts[i-1][0]+1e-6);
 function curveTono(r){
- const g=geoCiclo(r),L=durCiclo(r);
- return {f:[[0,196],[g.t2,246.94],[g.top,293.66],[L,146.83]],
-  lp:[[0,820],[g.top,1000],[L,360]],
-  g:[[0,1e-4],[.35,PICCO],[g.t2,PICCO],[(g.t2+g.top)/2,PICCO*1.18],[g.top,PICCO*1.05],[g.top+r.out*.55,PICCO*.6],[L-.05,1e-4]]};
+ const g=geoCiclo(r),L=durCiclo(r),P_=PAUSA_SORSO;
+ const stacco=P_>=.1?[[g.ti-.1,PICCO],[g.ti+Math.min(.12,P_*.4),PICCO*TONO_STACCO],[g.t2,PICCO*TONO_STACCO]]:[[g.ti,PICCO]];
+ return {f:crescenti([[0,196],[g.ti,246.94],[g.t2,246.94],[g.top,293.66],[L,146.83]]),
+  lp:crescenti([[0,820],[g.ti,920],[g.t2,920],[g.top,1000],[L,360]]),
+  g:crescenti([[0,1e-4],[.35,PICCO],...stacco,[g.t2+Math.min(.15,r.sorso*.2),PICCO],[g.t2+r.sorso/2,PICCO*1.18],
+   [g.top,PICCO*1.05],[g.top+r.out*.55,PICCO*.6],[L-.05,1e-4]])};
 }
 function interp(pts,t){
  if(t<=pts[0][0])return pts[0][1];
@@ -735,9 +754,9 @@ function tonoBreve(f0,f1_){ // assaggio del volume
  g.gain.setValueAtTime(1e-4,n);g.gain.exponentialRampToValueAtTime(PICCO,n+.25);g.gain.exponentialRampToValueAtTime(1e-4,n+1.15);
  o.connect(g);g.connect(AU.duck);o.start(n);o.stop(n+1.2);
 }
-function click(){
+function click(fra=0){
  const a=AU.ctx;if(!a||a.state!=='running')return;
- const n=a.currentTime+.005,o=a.createOscillator(),g=a.createGain();
+ const n=a.currentTime+Math.max(.005,fra),o=a.createOscillator(),g=a.createGain();
  o.type='sine';o.frequency.setValueAtTime(1180,n);o.frequency.exponentialRampToValueAtTime(640,n+.07);
  g.gain.setValueAtTime(1e-4,n);g.gain.exponentialRampToValueAtTime(.12,n+.006);g.gain.exponentialRampToValueAtTime(1e-4,n+.11);
  o.connect(g);g.connect(AU.duck);o.start(n);o.stop(n+.13);
@@ -843,13 +862,14 @@ function voceFem(){
  return _voceFem;
 }
 if('speechSynthesis'in window)speechSynthesis.onvoiceschanged=()=>{_voceFem=null;};
-// una frase alla volta: se la precedente sta ancora parlando, questa aspetta (max 0,8 s) o si salta
-function parlaGuida(chiave,ciclo){
+// una frase alla volta: se la precedente sta ancora parlando, questa aspetta (max 0,8 s) o si salta.
+// fra = fra quanti secondi cade il cue: la frase si programma lì
+function parlaGuida(chiave,ciclo,fra=0){
  if(!S.voce)return false;
  const nome=vocePerFrase(chiave,ciclo)+'-'+chiave+'.mp3',buf=VOICE.buf.get(nome),a=AU.ctx;
  if(buf&&a&&a.state==='running'){
   const inf=VOICE.info.get(nome)||{da:0,a:buf.duration,gain:1};
-  let t=a.currentTime+.02;
+  let t=a.currentTime+Math.max(.02,fra);
   if(VOICE.fine>t){if(VOICE.fine-t>MAX_ATTESA_VOCE){VOICE.saltate++;return false;}t=VOICE.fine+.04;}
   try{
    const dur=Math.max(.2,inf.a-inf.da),src=a.createBufferSource(),g=a.createGain();
@@ -857,7 +877,7 @@ function parlaGuida(chiave,ciclo){
    g.gain.setValueAtTime(1e-4,t);g.gain.linearRampToValueAtTime(inf.gain,t+.04);
    g.gain.setValueAtTime(inf.gain,t+Math.max(.05,dur-.1));g.gain.linearRampToValueAtTime(1e-4,t+dur);
    src.connect(g);g.connect(AU.voceBus);src.start(t,inf.da,dur);
-   VOICE.cur={src,g};VOICE.fine=t+dur;VOICE.partite.push({nome,t,dur});
+   VOICE.cur={src,g,t};VOICE.fine=t+dur;VOICE.partite.push({nome,t,dur});
    abbassaToni(t,t+dur);
    src.onended=()=>{try{g.disconnect();src.disconnect();}catch(e){}};
    return true;
@@ -868,7 +888,8 @@ function parlaGuida(chiave,ciclo){
 function zitto(){
  try{speechSynthesis.cancel();}catch(e){}
  const a=AU.ctx;if(!a)return;const t=a.currentTime;
- if(VOICE.cur){const {src,g}=VOICE.cur;try{g.gain.cancelScheduledValues(t);g.gain.setTargetAtTime(1e-4,t,.02);src.stop(t+.12);}catch(e){}VOICE.cur=null;}
+ if(VOICE.cur){const {src,g}=VOICE.cur,t0=VOICE.cur.t;   // una frase programmata e non ancora partita non parte più
+  try{if(t0>t)src.stop(t);else{g.gain.cancelScheduledValues(t);g.gain.setTargetAtTime(1e-4,t,.02);src.stop(t+.12);}}catch(e){}VOICE.cur=null;}
  VOICE.fine=0;
  try{AU.duck.gain.cancelScheduledValues(t);AU.duck.gain.setTargetAtTime(1,t,.1);}catch(e){}
 }
@@ -953,7 +974,7 @@ function inizia(){
  controllaAudio(true);clearInterval(P.ctrl);P.ctrl=setInterval(()=>controllaAudio(),1000);
 }
 function avvia(){
- P.stato='attiva';P.t0=performance.now();P.uiKey='';P.toneCiclo=-1;P.elPrec=P.acc;
+ P.stato='attiva';P.t0=performance.now();P.uiKey='';P.toneCiclo=-1;P.elPrec=P.acc-ANTICIPO_AUDIO;   // alla ripresa rifà i cue dei prossimi 60 ms, annullati dalla pausa
  $('pausa').textContent='Pausa';
  if(passo(P.acc))P.raf=requestAnimationFrame(tick);
 }
@@ -964,26 +985,28 @@ function tick(now){
 function passo(el){ // porta tutto al tempo el; false se la sessione è finita
  const prec=P.elPrec;P.el=el;P.elPrec=el;
  if(el>=P.totale){finisci();return false;}
- const r=P.r,f=faseA(el,r),fu=f.fase==='prep'?'prep':faseUI(f.tc,r),k=f.ciclo+'-'+fu;
+ const r=P.r,f=faseA(el,r),fu=f.fase,k=f.ciclo+'-'+fu;
  if(k!==P.uiKey){
-  P.uiKey=k;scriviFase(fu==='prep'?TESTI.intro:TESTI[fu]);
+  P.uiKey=k;
+  scriviFase(fu==='prep'?TESTI.intro:fu==='stacco'?TESTI.in:TESTI[fu]);   // nello stacco resta «Inspira dal naso», le etichette si spengono
   $('ciclo').textContent=Math.min(f.ciclo+1,P.cicli);
   $('binario').querySelectorAll('text').forEach(t=>t.classList.toggle('on',t.dataset.f===fu));
  }
- if(el>=0&&el>prec)eventi(prec,el);
+ if(el>prec)eventi(prec,el);
  if(S.suono&&f.fase!=='prep'&&P.toneCiclo!==f.ciclo){P.toneCiclo=f.ciclo;tonoCiclo(f.tc);}
  disegna(f,el);
  return true;
 }
-// voce, click e vibrazione scattano UNA volta quando il tempo attraversa il loro istante
+// voce, click e vibrazione scattano UNA volta per cue: si guarda ANTICIPO_AUDIO avanti e si programmano
+// sull'orologio audio all'istante esatto, così un frame in ritardo non sposta la voce
 function eventi(a,b){
- const r=P.r,L=durCiclo(r),cue=cueCiclo(r);
- for(let c=Math.max(0,Math.floor(a/L));c<=Math.floor(b/L);c++)
-  for(const q of cue){const T=c*L+q.t;if(T>a&&T<=b&&T<P.totale)evento(q.k,c);}
+ const r=P.r,L=durCiclo(r),cue=cueCiclo(r),A=ANTICIPO_AUDIO;
+ for(let c=Math.max(0,Math.floor((a+A)/L));c<=Math.floor((b+A)/L);c++)
+  for(const q of cue){const T=c*L+q.t;if(T>a+A&&T<=b+A&&T<P.totale)evento(q.k,c,Math.max(0,T-b));}
 }
-function evento(k,c){
- if(k==='sorso'){if(S.suono)click();vibra();}
- if(S.voce&&c<VOCE_CICLI)parlaGuida(k,c);
+function evento(k,c,fra){
+ if(k==='sorso'){if(S.suono)click(fra);setTimeout(vibra,fra*1000);}
+ if(S.voce&&c<VOCE_CICLI)parlaGuida(k,c,fra);
 }
 let _resto='';
 function disegna(f,el){
@@ -1055,7 +1078,7 @@ function render(){
  document.querySelectorAll('[data-voce]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.voce===S.voceScelta)));
  document.querySelectorAll('[data-t]').forEach(b=>b.setAttribute('aria-checked',String(S[b.dataset.t])));
  const r=RITMI[S.ritmo],pi=piano(S.durata,r);
- $('pianoTesto').textContent=`Inspira ${num(r.in)} s, sorso ${num(r.sorso)} s, espira ${num(r.out)} s. ${pi.cicli} cicli da ${num(durCiclo(r))} s: ${mmss(Math.ceil(pi.totale))}.`;
+ $('pianoTesto').textContent=`Inspira ${num(r.in)} s, pausa ${num(PAUSA_SORSO)} s, sorso ${num(r.sorso)} s, espira ${num(r.out)} s. ${pi.cicli} cicli da ${num(durCiclo(r))} s: ${mmss(Math.ceil(pi.totale-1e-6))}.`;
  const udibile=S.suono||S.voce;
  $('volume').value=Math.round(S.volume*100);$('volume').disabled=!udibile;$('volRiga').classList.toggle('spento',!udibile);
  $('volOut').textContent=Math.round(S.volume*100)+'%';
@@ -1112,8 +1135,8 @@ if(S.voce)precaricaVoce();   // i file arrivano mentre leggi: quando premi Inizi
 
 /* hook minimi per i test automatici (nessun effetto sull'uso normale) */
 try{window.__CICLO_TEST={RITMI,SCALA,durCiclo,piano,faseA,faseUI,cueCiclo,geoCiclo,volumeCiclo,flussoCiclo,scalaCiclo,
- livelloCiclo,livelloDaVolume,curveTono,interp,TESTI,P,AU,VOICE,PREP,SORSO_ANTICIPO,DUCK,passo,pausa,riprendi,ferma,
- tornaIntro,statistiche,statoVoce,controllaAudio,analizza};}catch(e){}
+ livelloCiclo,livelloDaVolume,curveTono,interp,TESTI,P,AU,VOICE,PREP,PAUSA_SORSO,QUOTA_NASO,DUCK,passo,pausa,riprendi,ferma,
+ tornaIntro,statistiche,statoVoce,controllaAudio,analizza,disegnaCampo};}catch(e){}
 </script>
 </body>
 </html>
