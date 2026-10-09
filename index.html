@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FAF9F5">
+<meta name="color-scheme" content="light">
+<meta name="description" content="Sospiro ciclico (cyclic sighing): guida alla respirazione, cinque minuti al giorno.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Sospiro ciclico</title>
+<style>
+  :root{
+    --ground:#FAF9F5; --raised:#FFFFFF; --line:#E8E4DC; --line2:#D6CFC2;
+    --terra:#C2664A; --terraDim:#A34E35; --porpora:#7A2E3C;
+    --text:#29261F; --muted:#6b6355;
+    --serif:'Cormorant','Cormorant Garamond',Georgia,'Times New Roman',serif;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+    color-scheme:light;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  [hidden]{display:none!important}
+  html{-webkit-text-size-adjust:100%}
+  html.chiuso,html.chiuso body{overflow:hidden}
+  body{background:var(--ground);color:var(--text);font-family:var(--sans);line-height:1.55;
+       min-height:100vh;min-height:100dvh;overscroll-behavior:none}
+  button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+  :focus-visible{outline:2px solid var(--porpora);outline-offset:3px}
+  a{color:var(--terraDim)}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .wrap{max-width:30rem;margin:0 auto;
+        padding:calc(1.75rem + env(safe-area-inset-top)) 1.25rem calc(3rem + env(safe-area-inset-bottom))}
+  .eyebrow{font-size:.75rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+  .titolo{font-family:var(--serif);font-weight:400;font-size:2.75rem;line-height:1.05;margin:.5rem 0 .875rem}
+  .lead{font-family:var(--serif);font-size:1.1875rem;line-height:1.5}
+  .card{background:var(--raised);border:1px solid var(--line);border-radius:.75rem;padding:1.25rem 1rem;margin-top:1.25rem}
+  .etichetta{font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin:1rem 0 .5rem}
+  .etichetta:first-child{margin-top:0}
+  .row{display:flex;gap:.5rem}
+  .pill{flex:1;min-width:0;min-height:2.75rem;padding:.5rem .25rem;border-radius:.5rem;border:1px solid var(--line2);
+        background:var(--ground);font-size:.9375rem;display:flex;flex-direction:column;align-items:center;
+        justify-content:center;gap:.1rem;transition:background .2s,border-color .2s}
+  .pill small{font-size:.75rem;color:var(--muted);white-space:nowrap}
+  .pill[aria-pressed="true"]{background:var(--terraDim);border-color:var(--terraDim);color:#FFF}
+  .pill[aria-pressed="true"] small{color:#F6E9E3}
+  .nota{font-size:.8125rem;line-height:1.55;color:var(--muted);margin-top:.5rem}
+  .sw{display:flex;width:100%;min-height:3rem;align-items:center;justify-content:space-between;gap:1rem;
+      padding:.625rem .75rem;border:1px solid var(--line);border-radius:.5rem;margin-bottom:.5rem;
+      text-align:left;background:var(--ground)}
+  .sw b{display:block;font-weight:500;font-size:.9375rem}
+  .sw small{display:block;font-size:.8125rem;color:var(--muted)}
+  .knob{flex:none;width:2.75rem;height:1.5rem;border-radius:999px;background:var(--line2);
+        display:flex;align-items:center;padding:3px;transition:background .2s}
+  .knob i{width:1.125rem;height:1.125rem;border-radius:50%;background:#FFF;
+          box-shadow:0 1px 2px rgba(41,38,31,.25);transition:transform .2s}
+  .sw[aria-checked="true"] .knob{background:var(--terraDim)}
+  .sw[aria-checked="true"] .knob i{transform:translateX(1.25rem)}
+  .vol{display:flex;align-items:center;gap:.75rem;min-height:2.75rem;padding:0 .75rem;margin-bottom:.5rem}
+  .vol label{font-size:.875rem;color:var(--muted)}
+  .vol input{flex:1;min-width:0;height:2.75rem;accent-color:var(--terraDim)}
+  .vol output{font-size:.8125rem;color:var(--muted);min-width:2.5rem;text-align:right;font-variant-numeric:tabular-nums}
+  .vol.spento{opacity:.45}
+  .primario{display:block;width:100%;min-height:3.25rem;margin-top:1.25rem;border-radius:999px;
+            background:var(--terraDim);color:#FFF;font-size:.9375rem;font-weight:500;
+            letter-spacing:.2em;text-transform:uppercase}
+  .secondario{min-height:2.75rem;min-width:7.5rem;padding:.625rem 1.5rem;border-radius:999px;
+              border:1px solid var(--line2);background:var(--raised);font-size:.8125rem;
+              letter-spacing:.18em;text-transform:uppercase}
+  .avviso{border:1px solid var(--porpora);border-radius:.75rem;padding:1rem;margin-top:1.5rem;
+          background:var(--raised);font-family:var(--serif);font-size:1.1875rem;line-height:1.4;color:var(--porpora)}
+  .sez{margin-top:3rem;padding-top:2rem;border-top:1px solid var(--line)}
+  .sez h2{font-family:var(--serif);font-weight:400;font-size:1.875rem;line-height:1.15;margin-bottom:1rem}
+  .sez p{margin-bottom:.75rem}
+  .sez ul{padding-left:1.15rem;margin-bottom:.75rem}
+  .sez li{margin-bottom:.375rem}
+  /* diario */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1.25rem}
+  .stat{background:var(--raised);border:1px solid var(--line);border-radius:.5rem;padding:.75rem .375rem;text-align:center}
+  .stat b{display:block;font-family:var(--serif);font-size:2.125rem;font-weight:400;line-height:1.1;
+          color:var(--porpora);font-variant-numeric:tabular-nums}
+  .stat span{display:block;font-size:.75rem;line-height:1.3;color:var(--muted)}
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:.375rem}
+  .cal .wd{font-size:.6875rem;color:var(--muted);text-align:center;letter-spacing:.08em}
+  .g{aspect-ratio:1;border-radius:.375rem;border:1px solid var(--line);background:var(--raised);
+     display:flex;align-items:center;justify-content:center;font-size:.75rem;color:var(--muted);
+     font-variant-numeric:tabular-nums}
+  .g.on{background:var(--terraDim);border-color:var(--terraDim);color:#FFF}
+  .g.oggi{outline:2px solid var(--porpora);outline-offset:1px}
+  .legenda{display:flex;flex-wrap:wrap;gap:.25rem 1rem;margin-top:.75rem;font-size:.75rem;color:var(--muted)}
+  .legenda i{display:inline-block;width:.75rem;height:.75rem;border-radius:.2rem;vertical-align:-.1rem;
+             margin-right:.35rem;border:1px solid var(--line);background:var(--raised)}
+  .legenda i.on{background:var(--terraDim);border-color:var(--terraDim)}
+  /* come si fa */
+  .passi{list-style:none;display:grid;gap:.75rem;margin-bottom:1rem}
+  .passo{display:grid;grid-template-columns:6.5rem 1fr;gap:1rem;align-items:center;background:var(--raised);
+         border:1px solid var(--line);border-radius:.75rem;padding:1rem}
+  .passo svg{width:100%;height:auto;display:block}
+  .passo h3{font-family:var(--serif);font-weight:500;font-size:1.25rem;line-height:1.2;margin-bottom:.25rem}
+  .passo h3 span{color:var(--terraDim)}
+  .passo p{font-size:.9375rem;margin:0}
+  .tr{fill:none;stroke:var(--line2);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .tr.on{stroke:var(--terraDim);stroke-width:4}
+  .cautela{border-left:3px solid var(--porpora);background:var(--raised);border-radius:0 .5rem .5rem 0;
+           padding:1rem 1rem 1rem 1.25rem}
+  .cautela p:last-child{margin-bottom:0}
+  .piede{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--line);font-size:.8125rem;color:var(--muted)}
+  .link{min-height:2.75rem;padding:.5rem 0;color:var(--terraDim);text-decoration:underline}
+  /* sessione e fine */
+  .schermo{position:fixed;inset:0;z-index:10;background:var(--ground);display:flex;flex-direction:column;overflow:auto}
+  .barra{display:flex;justify-content:space-between;align-items:center;gap:1rem;min-height:3.5rem;
+         padding:calc(1rem + env(safe-area-inset-top)) 1.25rem 0}
+  .barra b{font-weight:400;color:var(--text);font-variant-numeric:tabular-nums}
+  .centro{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          gap:1.25rem;padding:1rem 1.25rem;text-align:center}
+  .stage{position:relative;width:min(76vw,19rem);aspect-ratio:1;flex:none}
+  @media (max-height:660px){.stage{width:min(62vw,42vh)}}
+  .anello{position:absolute;inset:0;border-radius:50%;border:1px solid var(--line2)}
+  .anello.medio{inset:10%;border-style:dashed}
+  .disco{position:absolute;inset:0;border-radius:50%;transform:scale(.42);opacity:1;will-change:transform,opacity;
+         background:radial-gradient(circle at 50% 40%,#DE9479 0%,var(--terra) 58%,#9C4A3F 100%)}
+  .nucleo{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;
+          background:var(--ground);opacity:.85}
+  .fase{font-family:var(--serif);font-size:clamp(1.75rem,7.5vw,2.375rem);line-height:1.2;min-height:2.5em;
+        max-width:20rem;display:flex;align-items:center;justify-content:center}
+  .fasi{list-style:none;display:flex;gap:.375rem}
+  .fasi li{font-size:.75rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+           padding:.25rem .625rem;border-radius:999px;border:1px solid transparent}
+  .fasi li.on{color:var(--porpora);border-color:var(--porpora)}
+  .resto{font-size:1.625rem;color:var(--muted);font-variant-numeric:tabular-nums}
+  .avanz{width:100%;max-width:19rem;height:4px;background:var(--line);border-radius:99px;overflow:hidden}
+  .avanz div{height:100%;width:0;background:var(--terra)}
+  .comandi{display:flex;gap:.75rem;justify-content:center;padding:0 1.25rem calc(2rem + env(safe-area-inset-bottom))}
+  .stop{color:var(--porpora);border-color:var(--porpora)}
+  .fine .eyebrow{font-family:var(--sans);font-size:.75rem}
+  #fineTitolo:focus{outline:none}
+  .fine h2{font-family:var(--serif);font-weight:400;font-size:2.25rem;line-height:1.15}
+  .fine p{font-family:var(--serif);font-size:1.25rem;line-height:1.45;max-width:20rem}
+  .punti{display:flex;gap:.875rem;justify-content:center;margin-top:.5rem}
+  .punto{width:.75rem;height:.75rem;border-radius:50%;border:1px solid var(--terraDim);transition:background .6s}
+  .punto.on{background:var(--terraDim)}
+  .riep{font-family:var(--sans)!important;font-size:.9375rem!important;color:var(--muted)}
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<main id="intro" class="wrap">
+  <header>
+    <p class="eyebrow">Cyclic sighing · 5 minuti al giorno</p>
+    <h1 class="titolo">Sospiro ciclico</h1>
+    <p class="lead">Due inspirazioni dal naso, una lunga espirazione dalla bocca.<br>
+      Cinque minuti al giorno, seduto o sdraiato. Nient'altro.</p>
+  </header>
+
+  <p id="seraAvviso" class="avviso" hidden>È sera. Fallo a letto, a luce spenta: cinque minuti di sospiri, poi dormi.</p>
+
+  <section class="card" aria-label="Impostazioni della sessione">
+    <p class="etichetta" id="lblDurata">Durata</p>
+    <div class="row" role="group" aria-labelledby="lblDurata">
+      <button class="pill" data-durata="3">3 min</button>
+      <button class="pill" data-durata="5">5 min</button>
+      <button class="pill" data-durata="10">10 min</button>
+    </div>
+
+    <p class="etichetta" id="lblRitmo">Ritmo</p>
+    <div class="row" role="group" aria-labelledby="lblRitmo">
+      <button class="pill" data-ritmo="dolce"><span>Dolce</span><small>4 + 1,5 + 7 s</small></button>
+      <button class="pill" data-ritmo="standard"><span>Standard</span><small>3 + 1 + 6 s</small></button>
+      <button class="pill" data-ritmo="lungo"><span>Lungo</span><small>5 + 1,5 + 10 s</small></button>
+    </div>
+    <p id="pianoTesto" class="nota"></p>
+
+    <p class="etichetta">Guida</p>
+    <button class="sw" role="switch" data-t="voce" aria-checked="false">
+      <span><b>Voce</b><small>Voce femminile, solo nei primi 3 cicli</small></span>
+      <span class="knob" aria-hidden="true"><i></i></span></button>
+    <button class="sw" role="switch" data-t="suono" aria-checked="false">
+      <span><b>Suono</b><small>Toni morbidi che salgono e scendono col respiro</small></span>
+      <span class="knob" aria-hidden="true"><i></i></span></button>
+    <div class="vol" id="volRiga">
+      <label for="volume">Volume</label>
+      <input type="range" id="volume" min="0" max="100" step="5" value="60">
+      <output id="volOut" for="volume">60%</output>
+    </div>
+    <button class="sw" role="switch" data-t="vibra" aria-checked="false">
+      <span><b>Vibrazione</b><small id="vibraNota">Un tocco al secondo sorso, se il telefono lo supporta</small></span>
+      <span class="knob" aria-hidden="true"><i></i></span></button>
+
+    <button id="inizia" class="primario">Inizia</button>
+  </section>
+
+  <section class="sez" aria-labelledby="hDiario">
+    <h2 id="hDiario">Diario</h2>
+    <div class="stats">
+      <div class="stat"><b id="stGiorni">0</b><span>giorni di pratica</span></div>
+      <div class="stat"><b id="stSerie">0</b><span id="stSerieU">giorni di fila</span></div>
+      <div class="stat"><b id="stMinuti">0</b><span>minuti in tutto</span></div>
+    </div>
+    <p class="etichetta">Ultimi 28 giorni</p>
+    <div id="cal" class="cal" role="img" aria-label="Ultimi 28 giorni"></div>
+    <div class="legenda" aria-hidden="true">
+      <span><i class="on"></i>con pratica</span><span><i></i>senza</span><span>bordo scuro = oggi</span>
+    </div>
+    <p class="nota">Conta ogni sessione di almeno un minuto. La serie resta viva fino a stasera anche se oggi non hai ancora fatto.</p>
+  </section>
+
+  <section class="sez" aria-labelledby="hCome">
+    <h2 id="hCome">Come si fa</h2>
+    <p>Seduto comodo o sdraiato. Un ciclo dura una decina di secondi e si ripete, senza pause.</p>
+    <ol class="passi">
+      <li class="passo">
+        <svg viewBox="0 0 120 56" aria-hidden="true">
+          <line x1="4" y1="52" x2="116" y2="52" stroke="#E8E4DC" stroke-width="1"/>
+          <path class="tr on" d="M4 46 C16 46 26 20 40 20"/>
+          <path class="tr" d="M40 20 L46 9 L54 9"/>
+          <path class="tr" d="M54 9 C78 9 96 46 116 46"/>
+        </svg>
+        <div><h3><span>1.</span> Inspira dal naso</h3>
+          <p>Un respiro normale, senza forzare. I polmoni si riempiono quasi del tutto.</p></div>
+      </li>
+      <li class="passo">
+        <svg viewBox="0 0 120 56" aria-hidden="true">
+          <line x1="4" y1="52" x2="116" y2="52" stroke="#E8E4DC" stroke-width="1"/>
+          <path class="tr" d="M4 46 C16 46 26 20 40 20"/>
+          <path class="tr on" d="M40 20 L46 9 L54 9"/>
+          <path class="tr" d="M54 9 C78 9 96 46 116 46"/>
+        </svg>
+        <div><h3><span>2.</span> Ancora un sorso</h3>
+          <p>Subito dopo, sempre dal naso, una seconda inspirazione breve: riempie i polmoni fino in fondo.</p></div>
+      </li>
+      <li class="passo">
+        <svg viewBox="0 0 120 56" aria-hidden="true">
+          <line x1="4" y1="52" x2="116" y2="52" stroke="#E8E4DC" stroke-width="1"/>
+          <path class="tr" d="M4 46 C16 46 26 20 40 20"/>
+          <path class="tr" d="M40 20 L46 9 L54 9"/>
+          <path class="tr on" d="M54 9 C78 9 96 46 116 46"/>
+        </svg>
+        <div><h3><span>3.</span> Espira lentamente dalla bocca</h3>
+          <p>Lascia uscire tutta l'aria, piano, fino in fondo. Dura circa il doppio dell'inspirazione: è la parte che conta di più.</p></div>
+      </li>
+    </ol>
+    <p class="nota">Se ti gira la testa o senti formicolii, passa al ritmo Dolce o fermati e respira come viene.</p>
+  </section>
+
+  <section class="sez" aria-labelledby="hRicerca">
+    <h2 id="hRicerca">Cosa dice la ricerca</h2>
+    <p>Nel 2023 un gruppo della Stanford University (Balban, Spiegel, Huberman e colleghi) ha pubblicato su
+      <i>Cell Reports Medicine</i> uno studio randomizzato fatto a distanza: circa 110 adulti, cinque minuti al giorno
+      per un mese, divisi in quattro gruppi. Sospiro ciclico, <i>box breathing</i>, iperventilazione ciclica con apnea,
+      meditazione mindfulness.</p>
+    <p><b>Cosa hanno misurato.</b> L'umore, con questionari quotidiani su emozioni positive, negative e ansia.
+      E, con un sensore da polso, frequenza respiratoria, frequenza cardiaca e variabilità cardiaca.</p>
+    <p><b>Cosa hanno trovato.</b></p>
+    <ul>
+      <li>Il sospiro ciclico ha dato il miglioramento più grande dell'umore positivo, più della meditazione.</li>
+      <li>Ha abbassato la frequenza respiratoria a riposo più della meditazione.</li>
+      <li>Il beneficio cresceva con i giorni di pratica.</li>
+      <li>Emozioni negative e ansia sono calate in tutti i gruppi, meditazione compresa: qui il sospiro non ha fatto meglio.</li>
+      <li>Frequenza cardiaca e variabilità cardiaca: nessuna differenza significativa.</li>
+    </ul>
+    <p><b>Cosa non ha misurato: il cortisolo.</b> Chi dice che il sospiro ciclico «abbassa il cortisolo»
+      non lo ricava da questo studio.</p>
+    <p><b>Limiti.</b> Un solo studio, un campione piccolo, un mese. L'umore lo hanno riferito i partecipanti stessi,
+      e non c'era un gruppo che non facesse nulla.</p>
+    <p class="nota">Balban M.Y. et al., «Brief structured respiration practices enhance mood and reduce physiological
+      arousal», <i>Cell Reports Medicine</i> 4, 100895 (2023).
+      <a href="https://doi.org/10.1016/j.xcrm.2022.100895" target="_blank" rel="noopener">Leggi lo studio ↗</a></p>
+  </section>
+
+  <section class="sez" aria-labelledby="hSera">
+    <h2 id="hSera">La sera, a letto</h2>
+    <p>Il momento più facile è a letto, prima di dormire: luce spenta, schiena giù, cinque minuti di sospiri e poi sonno.
+      Con voce e suono attivi puoi tenere gli occhi chiusi: la voce ti accompagna nei primi cicli, poi bastano i toni.</p>
+    <p class="nota">Nessuna notifica: l'app non manda promemoria. Se vuoi, attiva un avviso solo testo che compare
+      in questa pagina dopo le 19, finché non hai fatto la pratica del giorno.</p>
+    <button class="sw" role="switch" data-t="sera" aria-checked="false">
+      <span><b>Promemoria serale</b><small>Solo un testo su questa pagina, la sera</small></span>
+      <span class="knob" aria-hidden="true"><i></i></span></button>
+  </section>
+
+  <section class="sez" aria-labelledby="hCautela">
+    <h2 id="hCautela">Con prudenza</h2>
+    <div class="cautela">
+      <p>Questa guida non sostituisce il parere di un medico.</p>
+      <p>Se hai asma grave, BPCO o attacchi di panico legati al respiro, vai piano: ritmo Dolce, pochi minuti,
+        e fermati se ti manca l'aria o ti gira la testa. Nel dubbio, chiedi prima al tuo medico.</p>
+    </div>
+  </section>
+
+  <footer class="piede">
+    <p>Nessun backend: il diario resta solo in questo browser (localStorage). Nessun dato viene inviato a nessuno.</p>
+    <button id="azzera" class="link">Azzera il diario</button>
+  </footer>
+</main>
+
+<div id="sessione" class="schermo" role="dialog" aria-modal="true" aria-label="Sessione di respirazione" hidden>
+  <div class="barra">
+    <span class="eyebrow">Ciclo <b id="ciclo">1</b> / <b id="cicloTot">0</b></span>
+    <span class="eyebrow">Restano <b id="resto">0:00</b></span>
+  </div>
+  <div class="centro">
+    <div class="stage" id="stage" aria-hidden="true">
+      <div class="anello"></div>
+      <div class="anello medio"></div>
+      <div class="disco" id="disco"></div>
+      <div class="nucleo"></div>
+    </div>
+    <p id="faseTesto" class="fase" aria-live="polite" aria-atomic="true"></p>
+    <ol class="fasi" id="fasi" aria-hidden="true">
+      <li data-f="in">naso</li><li data-f="sorso">sorso</li><li data-f="out">bocca</li>
+    </ol>
+    <div class="avanz" aria-hidden="true"><div id="avanz"></div></div>
+  </div>
+  <div class="comandi">
+    <button id="pausa" class="secondario">Pausa</button>
+    <button id="stop" class="secondario stop">Stop</button>
+  </div>
+</div>
+
+<div id="fine" class="schermo fine" role="dialog" aria-modal="true" aria-labelledby="fineTitolo" hidden>
+  <div class="centro">
+    <p class="eyebrow">Fatto</p>
+    <h2 id="fineTitolo" tabindex="-1">Hai fatto 0 cicli</h2>
+    <p id="fineNota" class="riep" hidden></p>
+    <div id="silenzio">
+      <p>Ora resta in silenzio.<br>Respira come viene.</p>
+      <div class="punti" aria-hidden="true"><span class="punto"></span><span class="punto"></span><span class="punto"></span></div>
+      <p class="sr">Tre secondi di silenzio.</p>
+    </div>
+    <div id="dopo" hidden>
+      <p>Bene così.</p>
+      <p id="riepilogo" class="riep" style="margin-top:.5rem"></p>
+      <button id="torna" class="primario" style="width:auto;padding:0 3rem;margin:1.75rem auto 0">Torna</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ─────────────── ritmi e testi ─────────────── */
+const RITMI={
+ dolce:{nome:'Dolce',in:4,sorso:1.5,out:7},
+ standard:{nome:'Standard',in:3,sorso:1,out:6},
+ lungo:{nome:'Lungo',in:5,sorso:1.5,out:10}};
+const DURATE=[3,5,10];
+const TESTI={in:'Inspira dal naso',sorso:'Ancora un sorso',out:'Espira lentamente dalla bocca'};
+const VOCE_CICLI=3;          // la voce guida solo i primi cicli, poi silenzio
+const SCALA={min:.42,mid:.8,max:1};
+const SILENZIO_MS=3000;
+const MIN_SEC_DIARIO=60;     // sotto il minuto la sessione non entra nel diario
+
+/* ─────────────── stato ─────────────── */
+const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:v;}catch(e){return d;}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}};
+const lsJSON=(k,d)=>{try{const v=lsGet(k,null);if(v===null)return d;const o=JSON.parse(v);
+  return o&&typeof o==='object'&&!Array.isArray(o)?o:d;}catch(e){return d;}};
+const PREF0={durata:5,ritmo:'standard',voce:true,suono:true,volume:.6,vibra:false,sera:false};
+const S={...PREF0,...lsJSON('cyclic:pref',{}),log:lsJSON('cyclic:log',{})};
+if(!RITMI[S.ritmo])S.ritmo=PREF0.ritmo;
+if(!DURATE.includes(S.durata))S.durata=PREF0.durata;
+S.volume=Math.min(1,Math.max(0,+S.volume||0));
+['voce','suono','vibra','sera'].forEach(k=>{S[k]=!!S[k];});
+Object.keys(S.log).forEach(k=>{const v=S.log[k];   // scarta voci rovinate
+ if(!/^\d{4}-\d\d-\d\d$/.test(k)||!v||typeof v!=='object'||!(+v.sec>0))delete S.log[k];});
+const salva=()=>{
+ lsSet('cyclic:log',JSON.stringify(S.log));
+ lsSet('cyclic:pref',JSON.stringify({durata:S.durata,ritmo:S.ritmo,voce:S.voce,suono:S.suono,
+   volume:S.volume,vibra:S.vibra,sera:S.sera}));
+};
+
+const $=id=>document.getElementById(id);
+const num=n=>String(n).replace('.',',');
+const mmss=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+// mezzogiorno locale: niente sorprese col cambio dell'ora
+const giorno=off=>{const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+off);return d;};
+const oggi=()=>iso(giorno(0));
+const mqRidotto=(()=>{try{return window.matchMedia?matchMedia('(prefers-reduced-motion: reduce)'):null;}catch(e){return null;}})();
+const ridotto=()=>!!(mqRidotto&&mqRidotto.matches);
+
+/* ─────────────── tempi del respiro ─────────────── */
+const durCiclo=r=>r.in+r.sorso+r.out;
+// cicli interi: il timer finisce sempre a fine espirazione
+function piano(minuti,r){
+ const L=durCiclo(r),n=Math.max(1,Math.round(minuti*60/L));
+ return {cicli:n,totale:n*L};
+}
+function faseA(el,r){
+ const L=durCiclo(r),ciclo=Math.floor(el/L);let t=el-ciclo*L;
+ if(t<r.in)return {ciclo,fase:'in',t,dur:r.in};
+ t-=r.in;
+ if(t<r.sorso)return {ciclo,fase:'sorso',t,dur:r.sorso};
+ return {ciclo,fase:'out',t:t-r.sorso,dur:r.out};
+}
+// dimensione e luce del cerchio; con movimento ridotto il cerchio resta fermo e cambia solo la luce
+function forma(f){
+ const p=Math.min(1,Math.max(0,f.t/f.dur)),morb=x=>.5-Math.cos(Math.PI*x)/2;
+ if(ridotto()){
+  const luce=f.fase==='in'?.35+.4*morb(p):f.fase==='sorso'?.75+.2*morb(p):.95-.6*morb(p);
+  return {scala:SCALA.mid,luce};}
+ if(f.fase==='in')return {scala:SCALA.min+(SCALA.mid-SCALA.min)*morb(p),luce:1};
+ if(f.fase==='sorso'){const q=Math.min(1,p/.45);   // scatto rapido nella prima metà del sorso
+  return {scala:SCALA.mid+(SCALA.max-SCALA.mid)*(1-Math.pow(1-q,3)),luce:1};}
+ return {scala:SCALA.max-(SCALA.max-SCALA.min)*morb(p),luce:1};
+}
+
+/* ─────────────── suono (Web Audio, tutto sintetizzato) ─────────────── */
+const AU={ctx:null,master:null,nodi:new Set()};
+function ac(){
+ try{
+  if(!AU.ctx){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;
+   AU.ctx=new C();AU.master=AU.ctx.createGain();AU.master.gain.value=S.volume*.9;
+   AU.master.connect(AU.ctx.destination);}
+  if(AU.ctx.state==='suspended')AU.ctx.resume();
+  return AU.ctx;
+ }catch(e){return null;}
+}
+function impostaVolume(v){
+ S.volume=v;
+ try{if(AU.master)AU.master.gain.setTargetAtTime(v*.9,AU.ctx.currentTime,.05);}catch(e){}
+}
+function registra(osc,g){
+ const n={osc,g};AU.nodi.add(n);
+ osc[0].onended=()=>AU.nodi.delete(n);
+}
+// tono morbido: sale in inspirazione, scende lungo in espirazione; off = secondi già passati nella fase
+function tono(fase,dur,off){
+ const a=ac();if(!a)return;
+ const resto=dur-off;if(resto<.08)return;
+ const n=a.currentTime+.01;
+ const [fa,fb]=fase==='in'?[196,293.66]:[293.66,146.83];
+ const fs=fa*Math.pow(fb/fa,off/dur);
+ const att=Math.min(.6,resto*.3),picco=fase==='in'?.22:.2;
+ const g=a.createGain(),lp=a.createBiquadFilter();
+ lp.type='lowpass';lp.frequency.value=900;lp.Q.value=.3;
+ g.gain.setValueAtTime(1e-4,n);
+ g.gain.exponentialRampToValueAtTime(picco,n+att);
+ if(fase==='in'){
+  g.gain.setValueAtTime(picco,n+Math.max(att,resto-.35));
+ }else{
+  g.gain.exponentialRampToValueAtTime(picco*.45,n+Math.max(att+.01,resto*.7));
+ }
+ g.gain.exponentialRampToValueAtTime(1e-4,n+resto);
+ lp.connect(g);g.connect(AU.master);
+ const osc=[['sine',1,1],['triangle',.5,.35]].map(([tipo,m,v])=>{
+  const o=a.createOscillator(),og=a.createGain();
+  o.type=tipo;o.frequency.setValueAtTime(fs*m,n);o.frequency.exponentialRampToValueAtTime(fb*m,n+resto);
+  og.gain.value=v;o.connect(og);og.connect(lp);o.start(n);o.stop(n+resto+.05);return o;});
+ registra(osc,g);
+}
+function click(){
+ const a=ac();if(!a)return;
+ const n=a.currentTime+.005,o=a.createOscillator(),g=a.createGain();
+ o.type='sine';o.frequency.setValueAtTime(1500,n);o.frequency.exponentialRampToValueAtTime(600,n+.06);
+ g.gain.setValueAtTime(1e-4,n);g.gain.exponentialRampToValueAtTime(.35,n+.005);
+ g.gain.exponentialRampToValueAtTime(1e-4,n+.09);
+ o.connect(g);g.connect(AU.master);o.start(n);o.stop(n+.1);
+ registra([o],g);
+}
+function silenzia(){
+ if(!AU.ctx)return;
+ const t=AU.ctx.currentTime;
+ AU.nodi.forEach(v=>{
+  try{const p=v.g.gain;if(p.cancelAndHoldAtTime)p.cancelAndHoldAtTime(t);else p.cancelScheduledValues(t);
+   p.setTargetAtTime(1e-4,t,.04);}catch(e){}
+  v.osc.forEach(o=>{try{o.stop(t+.25);}catch(e){}});
+ });
+ AU.nodi.clear();
+}
+function vibra(){if(S.vibra&&navigator.vibrate){try{navigator.vibrate(35);}catch(e){}}}
+
+/* ─────────────── voce (speechSynthesis, femminile it-IT) ─────────────── */
+let _voceFem=null;
+function voceFem(){
+ if(_voceFem)return _voceFem;
+ try{
+  const v=speechSynthesis.getVoices().filter(x=>x.lang&&x.lang.toLowerCase().replace('_','-').startsWith('it'));
+  const fem=v.find(x=>/alice|elsa|elisa|giulia|chiara|federica|paola|silvia|maria|anna|vittoria|alessandra|sara|valentina|martina|sofia|ginevra|ilaria|noemi|beatrice|aurora|gaia|viola|emma|greta|luce|antonella|caterina|donna|female/i.test(x.name));
+  const nonMaschile=v.find(x=>!/luca|cosimo|diego|giorgio|roberto|paolo|marco|carlo|giuseppe|male/i.test(x.name));
+  _voceFem=fem||nonMaschile||v[0]||null;
+ }catch(e){_voceFem=null;}
+ return _voceFem;
+}
+// iOS: getVoices() è vuoto al primo giro → invalida la cache quando arrivano
+if('speechSynthesis'in window)speechSynthesis.onvoiceschanged=()=>{_voceFem=null;};
+function parla(testo){
+ if(!('speechSynthesis'in window))return;
+ try{
+  if(speechSynthesis.pending)speechSynthesis.cancel(); // mai accumulare ritardo rispetto al respiro
+  const u=new SpeechSynthesisUtterance(testo);
+  u.lang='it-IT';u.rate=1;u.pitch=1.05;u.volume=.9;
+  const v=voceFem();if(v)u.voice=v;
+  speechSynthesis.speak(u);
+ }catch(e){}
+}
+const zitto=()=>{try{speechSynthesis.cancel();}catch(e){}};
+
+/* ─────────────── wake lock ─────────────── */
+const P={stato:'ferma',r:null,cicli:0,totale:0,el:0,acc:0,t0:0,raf:0,ultima:'',wake:null,silT:[]};
+let wakeInCorso=false;
+async function wakeOn(){
+ if(!('wakeLock'in navigator)||P.wake||wakeInCorso)return;
+ wakeInCorso=true;
+ try{
+  const w=await navigator.wakeLock.request('screen');
+  if(P.stato!=='attiva'){Promise.resolve(w.release()).catch(()=>{});return;} // pausa/stop arrivati nel frattempo
+  P.wake=w;
+  w.addEventListener('release',()=>{if(P.wake===w)P.wake=null;});
+ }catch(e){/* negato o non supportato: la sessione va avanti lo stesso */}
+ finally{wakeInCorso=false;}
+}
+function wakeOff(){
+ const w=P.wake;P.wake=null;
+ if(w){try{Promise.resolve(w.release()).catch(()=>{});}catch(e){}}
+}
+
+/* ─────────────── schermate ─────────────── */
+function mostra(nome){
+ $('sessione').hidden=nome!=='sessione';
+ $('fine').hidden=nome!=='fine';
+ const intro=$('intro');
+ if(nome==='intro'){intro.removeAttribute('inert');intro.removeAttribute('aria-hidden');}
+ else{intro.setAttribute('inert','');intro.setAttribute('aria-hidden','true');}
+ document.documentElement.classList.toggle('chiuso',nome!=='intro');
+}
+
+/* ─────────────── sessione ─────────────── */
+function inizia(){
+ if(P.stato!=='ferma')return;
+ const r=RITMI[S.ritmo],pi=piano(S.durata,r);
+ Object.assign(P,{r,cicli:pi.cicli,totale:pi.totale,el:0,acc:0,ultima:''});
+ if(S.suono)ac();            // dentro il gesto: sblocca l'audio su iOS
+ $('cicloTot').textContent=pi.cicli;
+ mostra('sessione');
+ P.stato='attiva';
+ wakeOn();                   // dopo il gesto Inizia
+ avvia();
+ $('pausa').focus();
+}
+function avvia(){
+ P.stato='attiva';P.t0=performance.now();P.ultima='';
+ $('pausa').textContent='Pausa';
+ if(passo(P.acc))P.raf=requestAnimationFrame(tick);
+}
+function tick(now){
+ if(P.stato!=='attiva')return;
+ if(passo(P.acc+Math.max(0,now-P.t0)/1000))P.raf=requestAnimationFrame(tick);
+}
+// porta tutto al tempo el; false se la sessione è finita
+function passo(el){
+ P.el=el;
+ if(el>=P.totale){finisci();return false;}
+ const f=faseA(el,P.r),k=f.ciclo+'-'+f.fase;
+ if(k!==P.ultima){P.ultima=k;entraFase(f);}
+ disegna(f,el);
+ return true;
+}
+function entraFase(f){
+ $('faseTesto').textContent=TESTI[f.fase];
+ $('ciclo').textContent=Math.min(f.ciclo+1,P.cicli);
+ $('fasi').querySelectorAll('li').forEach(li=>li.classList.toggle('on',li.dataset.f===f.fase));
+ const inizio=f.t<.4;        // alla ripresa dopo una pausa non si ripetono click, vibrazione e voce
+ if(S.suono){if(f.fase==='sorso'){if(inizio)click();}else tono(f.fase,f.dur,f.t);}
+ if(f.fase==='sorso'&&inizio)vibra();
+ if(S.voce&&f.ciclo<VOCE_CICLI&&inizio)parla(TESTI[f.fase]);
+}
+let _resto='';
+function disegna(f,el){
+ const {scala,luce}=forma(f),d=$('disco');
+ d.style.transform='scale('+scala.toFixed(4)+')';
+ d.style.opacity=luce.toFixed(3);
+ const r=mmss(Math.ceil(P.totale-el-1e-6));
+ if(r!==_resto){_resto=r;$('resto').textContent=r;}
+ $('avanz').style.width=Math.min(100,el/P.totale*100).toFixed(2)+'%';
+}
+function pausa(){
+ if(P.stato!=='attiva')return;
+ P.stato='pausa';cancelAnimationFrame(P.raf);P.acc=P.el;
+ silenzia();zitto();wakeOff();
+ $('faseTesto').textContent='In pausa';
+ $('pausa').textContent='Riprendi';
+}
+function riprendi(){
+ if(P.stato!=='pausa')return;
+ if(S.suono)ac();
+ P.stato='attiva';
+ wakeOn();
+ avvia();
+}
+function chiudiSessione(){
+ cancelAnimationFrame(P.raf);silenzia();zitto();wakeOff();
+ P.stato='fine';
+}
+function finisci(){
+ chiudiSessione();
+ concludi(P.totale,P.cicli);
+}
+function ferma(){
+ if(P.stato!=='attiva'&&P.stato!=='pausa')return;
+ const el=P.stato==='attiva'?P.el:P.acc;
+ chiudiSessione();
+ concludi(el,Math.floor(el/durCiclo(P.r)+1e-9));
+}
+function concludi(sec,cicli){
+ const salvato=sec>=MIN_SEC_DIARIO;
+ if(salvato){
+  const d=oggi(),v=S.log[d]||{sec:0,cicli:0,n:0};
+  S.log[d]={sec:Math.round((v.sec||0)+sec),cicli:(v.cicli||0)+cicli,n:(v.n||0)+1};
+  salva();
+ }
+ $('fineTitolo').textContent='Hai fatto '+cicli+(cicli===1?' ciclo':' cicli');
+ $('fineNota').hidden=salvato;
+ $('fineNota').textContent=salvato?'':'Meno di un minuto: non segnato nel diario.';
+ const st=statistiche(),v=S.log[oggi()];
+ $('riepilogo').textContent='Oggi '+(v?Math.max(1,Math.round(v.sec/60)):0)+' min · serie di '+
+   st.serie+(st.serie===1?' giorno':' giorni');
+ mostra('fine');
+ $('fineTitolo').focus();
+ // tre secondi di silenzio guidato, poi il ritorno
+ const punti=[...$('silenzio').querySelectorAll('.punto')];
+ $('silenzio').hidden=false;$('dopo').hidden=true;
+ punti.forEach((p,i)=>p.classList.toggle('on',i===0));
+ P.silT.forEach(clearTimeout);
+ P.silT=[1,2].map(i=>setTimeout(()=>punti[i].classList.add('on'),i*1000));
+ P.silT.push(setTimeout(()=>{$('silenzio').hidden=true;$('dopo').hidden=false;$('torna').focus();},SILENZIO_MS));
+}
+function tornaIntro(){
+ P.silT.forEach(clearTimeout);P.silT=[];
+ P.stato='ferma';
+ mostra('intro');
+ render();
+ $('inizia').focus();
+}
+
+/* ─────────────── diario ─────────────── */
+function statistiche(){
+ const giorni=Object.keys(S.log).filter(k=>S.log[k]&&S.log[k].sec>0);
+ const sec=giorni.reduce((a,k)=>a+S.log[k].sec,0);
+ let off=S.log[oggi()]?0:-1,serie=0;   // se oggi non hai ancora fatto, la serie conta fino a ieri
+ while(S.log[iso(giorno(off))]){serie++;off--;}
+ return {giorni:giorni.length,minuti:Math.round(sec/60),serie};
+}
+const dataBreve=d=>{try{return d.toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short'});}catch(e){return iso(d);}};
+const iniziale=d=>'DLMMGVS'[d.getDay()];
+function diario(){
+ const st=statistiche();
+ $('stGiorni').textContent=st.giorni;
+ $('stSerie').textContent=st.serie;
+ $('stSerieU').textContent=st.serie===1?'giorno di fila':'giorni di fila';
+ $('stMinuti').textContent=st.minuti;
+ let html='',fatti=0;
+ for(let j=0;j<7;j++)html+=`<span class="wd" aria-hidden="true">${iniziale(giorno(-27+j))}</span>`;
+ for(let i=27;i>=0;i--){
+  const d=giorno(-i),v=S.log[iso(d)];
+  if(v)fatti++;
+  html+=`<span class="g${v?' on':''}${i===0?' oggi':''}" aria-hidden="true" title="${dataBreve(d)}${
+    v?' · '+Math.max(1,Math.round(v.sec/60))+' min':''}">${d.getDate()}</span>`;
+ }
+ $('cal').innerHTML=html;
+ $('cal').setAttribute('aria-label',`Ultimi 28 giorni: ${fatti} con pratica`);
+}
+
+/* ─────────────── schermata iniziale ─────────────── */
+function render(){
+ document.querySelectorAll('[data-durata]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.durata===S.durata)));
+ document.querySelectorAll('[data-ritmo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.ritmo===S.ritmo)));
+ document.querySelectorAll('[data-t]').forEach(b=>b.setAttribute('aria-checked',String(S[b.dataset.t])));
+ const r=RITMI[S.ritmo],pi=piano(S.durata,r);
+ $('pianoTesto').textContent=`Inspira ${num(r.in)} s, sorso ${num(r.sorso)} s, espira ${num(r.out)} s. `+
+   `${pi.cicli} cicli da ${num(durCiclo(r))} s: ${mmss(Math.ceil(pi.totale))}.`;
+ $('volume').value=Math.round(S.volume*100);
+ $('volume').disabled=!S.suono;
+ $('volRiga').classList.toggle('spento',!S.suono);
+ $('volOut').textContent=Math.round(S.volume*100)+'%';
+ if(!('vibrate'in navigator))$('vibraNota').textContent='Un tocco al secondo sorso (questo browser non la supporta)';
+ $('inizia').textContent='Inizia · '+S.durata+' min';
+ const h=new Date().getHours();
+ $('seraAvviso').hidden=!(S.sera&&(h>=19||h<3)&&!S.log[oggi()]);
+ diario();
+}
+
+document.querySelectorAll('[data-durata]').forEach(b=>b.addEventListener('click',()=>{S.durata=+b.dataset.durata;salva();render();}));
+document.querySelectorAll('[data-ritmo]').forEach(b=>b.addEventListener('click',()=>{S.ritmo=b.dataset.ritmo;salva();render();}));
+document.querySelectorAll('[data-t]').forEach(b=>b.addEventListener('click',()=>{
+ const k=b.dataset.t;S[k]=!S[k];salva();render();
+ if(k==='suono'&&S.suono)click();   // assaggio del volume
+ if(k==='vibra'&&S.vibra)vibra();
+}));
+$('volume').addEventListener('input',e=>{impostaVolume(e.target.value/100);salva();
+ $('volOut').textContent=Math.round(S.volume*100)+'%';});
+$('volume').addEventListener('change',()=>{if(S.suono)click();});
+$('inizia').addEventListener('click',inizia);
+$('pausa').addEventListener('click',()=>{if(P.stato==='attiva')pausa();else riprendi();});
+$('stop').addEventListener('click',ferma);
+$('torna').addEventListener('click',tornaIntro);
+$('azzera').addEventListener('click',()=>{
+ if(confirm('Cancellare tutto il diario da questo browser?')){S.log={};salva();render();}});
+document.addEventListener('keydown',e=>{
+ if($('sessione').hidden)return;
+ if(e.key==='Escape')ferma();
+ else if(e.key===' '&&e.target===document.body){e.preventDefault();P.stato==='attiva'?pausa():riprendi();}
+});
+// in background il tempo del respiro non va avanti da solo: pausa automatica (e il wake lock decade)
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&P.stato==='attiva')pausa();});
+window.addEventListener('pagehide',()=>{if(P.stato==='attiva')pausa();});
+
+render();
+</script>
+</body>
+</html>
