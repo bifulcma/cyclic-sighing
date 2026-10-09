@@ -302,21 +302,16 @@
 
     <p class="etichetta" id="lblRitmo">Ritmo</p>
     <div class="row" role="group" aria-labelledby="lblRitmo">
-      <button class="pill" data-ritmo="dolce"><span>Dolce</span><small>4 + 1,2 + 7 s</small></button>
-      <button class="pill" data-ritmo="standard"><span>Standard</span><small>3 + 1,2 + 6 s</small></button>
-      <button class="pill" data-ritmo="lungo"><span>Lungo</span><small>5 + 1,2 + 10 s</small></button>
+      <button class="pill" data-ritmo="dolce"><span>Dolce</span><small>4 + 1,5 + 7 s</small></button>
+      <button class="pill" data-ritmo="standard"><span>Standard</span><small>3 + 1,5 + 6 s</small></button>
+      <button class="pill" data-ritmo="lungo"><span>Lungo</span><small>5 + 1,5 + 10 s</small></button>
     </div>
     <p id="pianoTesto" class="nota"></p>
 
     <p class="etichetta" id="lblVoce">Guida</p>
     <button class="sw" role="switch" data-t="voce" aria-checked="false">
-      <span><b>Voce</b><small>Isabella ed Elsa, solo nei primi 3 cicli</small></span>
+      <span><b>Voce</b><small>Ara, solo nei primi 3 cicli</small></span>
       <span class="knob" aria-hidden="true"><i></i></span></button>
-    <div class="row" id="voceSceltaRiga" role="group" aria-labelledby="lblVoce" style="margin-bottom:.5rem">
-      <button class="pill" data-voce="isabella"><span>Isabella</span><small>voce calda</small></button>
-      <button class="pill" data-voce="elsa"><span>Elsa</span><small>voce chiara</small></button>
-      <button class="pill" data-voce="alternate"><span>Alternate</span><small>un ciclo ciascuna</small></button>
-    </div>
     <div class="voceRiga" id="voceRiga">
       <p id="voceStato" class="nota" role="status">La voce si carica…</p>
       <button id="provaVoce" class="mini">Ascolta</button>
@@ -732,9 +727,9 @@ const indicePensiero=(d=new Date())=>giornoNotte(d)%PENSIERI.length;
 
 /* ─────────────── ritmi e testi ─────────────── */
 const RITMI={
- dolce:{nome:'Dolce',in:4,sorso:1.2,out:7},
- standard:{nome:'Standard',in:3,sorso:1.2,out:6},
- lungo:{nome:'Lungo',in:5,sorso:1.2,out:10}};
+ dolce:{nome:'Dolce',in:4,sorso:1.5,out:7},
+ standard:{nome:'Standard',in:3,sorso:1.5,out:6},
+ lungo:{nome:'Lungo',in:5,sorso:1.5,out:10}};   // sorso 1,5 s: «Ancora un sorso» di Ara (1,2 s di parlato) ci sta tutto dopo lo stacco
 const DURATE=[3,5,10];
 const TESTI={in:'Inspira dal naso',sorso:'Ancora un sorso',out:'Espira lentamente dalla bocca',svuota:'Svuota tutto',
  intro:'Mettiti comodo, spalle sciolte',fine:'Bene così, respira normalmente',pausa:'In pausa'};
@@ -750,28 +745,28 @@ const PREP=3.2;               // preparazione prima del primo ciclo (frase inizi
 const DUCK=.3;                // mentre parla la voce i toni scendono a 0,3 (−10 dB)
 const MAX_ATTESA_VOCE=.8;     // una frase aspetta al massimo 0,8 s che finisca la precedente, poi si salta
 const ANTICIPO_AUDIO=.06;     // voce e click si programmano 60 ms prima sull'orologio audio: partono all'istante esatto del cue
-// voce fissata al commit 0afe6ee (ramo grok-design): lì «Ancora un sorso» è più rapido e sta nel sorso dopo lo stacco
-const AUDIO_BASE='https://raw.githubusercontent.com/bifulcma/cyclic-sighing/0afe6eef074fa7547ac2b88372b30b9d88c2115d/audio/';
+// voce Ara (xAI Grok TTS), file fissati al commit ab0d698 del ramo grok-design: funziona anche aprendo il file in locale
+const AUDIO_BASE='https://raw.githubusercontent.com/bifulcma/cyclic-sighing/ab0d698ff965657e7880ac7e773745e7ccc586c8/audio/';
 const FRASI=['intro','in','sorso','out','svuota','fine'];
-const NOMI_VOCE={isabella:'Isabella',elsa:'Elsa',alternate:'Isabella ed Elsa'};
+const VOCE='ara',NOME_VOCE='Ara';   // una sola voce guida
 
 /* ─────────────── stato e piccole utilities ─────────────── */
 const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:v;}catch(e){return d;}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}};
 const lsJSON=(k,d)=>{try{const v=lsGet(k,null);if(v===null)return d;const o=JSON.parse(v);
   return o&&typeof o==='object'&&!Array.isArray(o)?o:d;}catch(e){return d;}};
-const PREF0={durata:5,ritmo:'standard',voce:true,voceScelta:'alternate',suono:true,volume:.6,vibra:false,sera:false};
+const PREF0={durata:5,ritmo:'standard',voce:true,suono:true,volume:.6,vibra:false,sera:false};
 const S={...PREF0,...lsJSON('cyclic:pref',{}),log:lsJSON('cyclic:log',{})};
 if(!RITMI[S.ritmo])S.ritmo=PREF0.ritmo;
 if(!DURATE.includes(S.durata))S.durata=PREF0.durata;
-if(!NOMI_VOCE[S.voceScelta])S.voceScelta=PREF0.voceScelta;
+delete S.voceScelta;          // vecchia scelta Isabella/Elsa/Alternate: ora c'è solo Ara
 S.volume=Math.min(1,Math.max(0,+S.volume||0));
 ['voce','suono','vibra','sera'].forEach(k=>{S[k]=!!S[k];});
 Object.keys(S.log).forEach(k=>{const v=S.log[k];   // scarta voci rovinate
  if(!/^\d{4}-\d\d-\d\d$/.test(k)||!v||typeof v!=='object'||!(+v.sec>0))delete S.log[k];});
 const salva=()=>{
  lsSet('cyclic:log',JSON.stringify(S.log));
- lsSet('cyclic:pref',JSON.stringify({durata:S.durata,ritmo:S.ritmo,voce:S.voce,voceScelta:S.voceScelta,
+ lsSet('cyclic:pref',JSON.stringify({durata:S.durata,ritmo:S.ritmo,voce:S.voce,
    suono:S.suono,volume:S.volume,vibra:S.vibra,sera:S.sera}));
 };
 
@@ -803,7 +798,7 @@ function geoCiclo(r){
 // fasi del ritmo scelto; el<0 è la preparazione
 function faseA(el,r){
  if(el<0)return {ciclo:0,tc:0,fase:'prep',t:el+PREP,dur:PREP};
- const L=durCiclo(r),ciclo=Math.floor(el/L+1e-12),tc=el-ciclo*L,g=geoCiclo(r);
+ const L=durCiclo(r),ciclo=Math.floor(el/L+1e-12),tc=Math.max(0,el-ciclo*L),g=geoCiclo(r);   // max(0,…): a inizio ciclo l'arrotondamento può dare −1e-15
  if(tc<g.ti)return {ciclo,tc,fase:'in',t:tc,dur:r.in};
  if(tc<g.t2)return {ciclo,tc,fase:'stacco',t:tc-g.ti,dur:PAUSA_SORSO};
  if(tc<g.top)return {ciclo,tc,fase:'sorso',t:tc-g.t2,dur:r.sorso};
@@ -1059,7 +1054,7 @@ function abbassaToni(t0,t1){ // ducking: la voce sopra, i toni sotto
  try{d.cancelScheduledValues(t0);d.setTargetAtTime(DUCK,t0,.06);d.setTargetAtTime(1,t1+.12,.22);}catch(e){}
 }
 
-/* ─────────────── voce: MP3 edge-tts scaricati all'apertura, fallback alla voce del telefono ─────────────── */
+/* ─────────────── voce: MP3 di Ara (Grok) scaricati all'apertura, fallback alla voce del telefono ─────────────── */
 const VOICE={buf:new Map(),info:new Map(),carico:null,tentato:false,cur:null,fine:0,partite:[],saltate:0,errore:''};
 const OAC=window.OfflineAudioContext||window.webkitOfflineAudioContext;
 let _dec=null;
@@ -1083,16 +1078,8 @@ function analizza(buf){
  const rms=n?Math.sqrt(s/n):.1;
  return {da:Math.max(0,i0/sr-.04),a:Math.min(buf.duration,i1/sr+.1),gain:clamp(Math.min(.14/rms,.95/(pk||1)),.5,3)};
 }
-function vocePerFrase(chiave,ciclo){
- if(S.voceScelta!=='alternate')return S.voceScelta;
- if(chiave==='intro')return 'isabella';
- if(chiave==='fine')return 'elsa';
- return ciclo%2?'elsa':'isabella';
-}
-function listaFileVoce(){
- const voci=S.voceScelta==='alternate'?['isabella','elsa']:[S.voceScelta];
- const out=[];voci.forEach(v=>FRASI.forEach(f=>out.push(v+'-'+f+'.mp3')));return out;
-}
+const fileVoce=chiave=>VOCE+'-'+chiave+'.mp3';
+const listaFileVoce=()=>FRASI.map(fileVoce);   // 6 file
 function contaVoce(){const l=listaFileVoce();return {n:l.filter(x=>VOICE.buf.has(x)).length,tot:l.length};}
 function statoVoce(){
  const {n,tot}=contaVoce();
@@ -1122,7 +1109,7 @@ function aggiornaStatoVoce(){
  if(e){
   let txt,cl='nota';
   if(!S.voce)txt='Voce spenta.';
-  else if(s==='pronta'){txt='Voce pronta: '+NOMI_VOCE[S.voceScelta]+'.';cl+=' ok';}
+  else if(s==='pronta'){txt='Voce pronta: '+NOME_VOCE+'.';cl+=' ok';}
   else if(s==='carico')txt='Carico la voce… '+n+'/'+tot;
   else if(s==='parziale'){txt='Voce incompleta ('+(tot-n)+' file non scaricati): per quelle frasi userò la voce del telefono.';cl+=' allarme';}
   else {txt='File della voce non raggiungibili (sei offline?). Userò la voce del telefono, se c’è.';cl+=' allarme';}
@@ -1157,7 +1144,7 @@ if('speechSynthesis'in window)speechSynthesis.onvoiceschanged=()=>{_voceFem=null
 // fra = fra quanti secondi cade il cue: la frase si programma lì
 function parlaGuida(chiave,ciclo,fra=0){
  if(!S.voce)return false;
- const nome=vocePerFrase(chiave,ciclo)+'-'+chiave+'.mp3',buf=VOICE.buf.get(nome),a=AU.ctx;
+ const nome=fileVoce(chiave),buf=VOICE.buf.get(nome),a=AU.ctx;
  if(buf&&a&&a.state==='running'){
   const inf=VOICE.info.get(nome)||{da:0,a:buf.duration,gain:1};
   let t=a.currentTime+Math.max(.02,fra);
@@ -1387,14 +1374,13 @@ function diario(){
 function render(){
  document.querySelectorAll('[data-durata]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.durata===S.durata)));
  document.querySelectorAll('[data-ritmo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.ritmo===S.ritmo)));
- document.querySelectorAll('[data-voce]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.voce===S.voceScelta)));
  document.querySelectorAll('[data-t]').forEach(b=>b.setAttribute('aria-checked',String(S[b.dataset.t])));
  const r=RITMI[S.ritmo],pi=piano(S.durata,r);
  $('pianoTesto').textContent=`Inspira ${num(r.in)} s, pausa ${num(PAUSA_SORSO)} s, sorso ${num(r.sorso)} s, espira ${num(r.out)} s. ${pi.cicli} cicli da ${num(durCiclo(r))} s: ${mmss(Math.ceil(pi.totale-1e-6))}.`;
  const udibile=S.suono||S.voce;
  $('volume').value=Math.round(S.volume*100);$('volume').disabled=!udibile;$('volRiga').classList.toggle('spento',!udibile);
  $('volOut').textContent=Math.round(S.volume*100)+'%';
- $('voceSceltaRiga').hidden=!S.voce;$('voceRiga').hidden=!S.voce;
+ $('voceRiga').hidden=!S.voce;
  aggiornaStatoVoce();
  if(!('vibrate'in navigator))$('vibraNota').textContent='Un tocco al secondo sorso (questo browser non la supporta)';
  if(!$('inizia').disabled)$('inizia').textContent='Inizia · '+S.durata+' min';
@@ -1403,7 +1389,6 @@ function render(){
 
 document.querySelectorAll('[data-durata]').forEach(b=>b.addEventListener('click',()=>{S.durata=+b.dataset.durata;salva();render();}));
 document.querySelectorAll('[data-ritmo]').forEach(b=>b.addEventListener('click',()=>{S.ritmo=b.dataset.ritmo;salva();render();}));
-document.querySelectorAll('[data-voce]').forEach(b=>b.addEventListener('click',()=>{S.voceScelta=b.dataset.voce;salva();render();if(S.voce)precaricaVoce();}));
 document.querySelectorAll('[data-t]').forEach(b=>b.addEventListener('click',()=>{
  const k=b.dataset.t;S[k]=!S[k];salva();render();
  if(k==='suono'&&S.suono){sblocca();tonoBreve(196,293.66);}   // assaggio morbido del volume
