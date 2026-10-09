@@ -2,992 +2,210 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#FAF9F5">
-<meta name="color-scheme" content="light">
-<meta name="description" content="Sospiro ciclico (cyclic sighing): guida alla respirazione, cinque minuti al giorno.">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Sospiro ciclico</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F3EEE4">
+<title>Sospiro ciclico · Marea</title>
 <style>
-  :root{
-    --ground:#FAF9F5; --raised:#FFFFFF; --line:#E8E4DC; --line2:#D6CFC2;
-    --terra:#C2664A; --terraDim:#A34E35; --porpora:#7A2E3C;
-    --text:#29261F; --muted:#6b6355;
-    --serif:'Cormorant','Cormorant Garamond',Georgia,'Times New Roman',serif;
-    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
-    color-scheme:light;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  [hidden]{display:none!important}
-  html{-webkit-text-size-adjust:100%}
-  html.chiuso,html.chiuso body{overflow:hidden}
-  body{background:var(--ground);color:var(--text);font-family:var(--sans);line-height:1.55;
-       min-height:100vh;min-height:100dvh;overscroll-behavior:none}
-  button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
-  :focus-visible{outline:2px solid var(--porpora);outline-offset:3px}
-  a{color:var(--terraDim)}
-  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-  .wrap{max-width:30rem;margin:0 auto;
-        padding:calc(1.5rem + env(safe-area-inset-top)) 1.25rem calc(3rem + env(safe-area-inset-bottom))}
-  .eyebrow{font-size:.75rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
-  /* testata: titolo e anfora-emblema */
-  .testa{display:flex;align-items:flex-end;justify-content:space-between;gap:.5rem}
-  .titolo{font-family:var(--serif);font-weight:400;font-size:2.875rem;line-height:1;margin-top:.625rem}
-  .titolo em{font-style:italic;color:var(--terraDim)}
-  .emblema{width:7rem;height:auto;flex:none;display:block;margin:-1.25rem -.375rem -.25rem 0}
-  .emblema .liq-g{animation:emblema 10.2s infinite}
-  @keyframes emblema{
-    0%{transform:translateY(178px);animation-timing-function:cubic-bezier(.35,0,.65,1)}
-    26%{transform:translateY(64px);animation-timing-function:cubic-bezier(.25,0,.35,1)}
-    40%{transform:translateY(10px);animation-timing-function:cubic-bezier(.3,0,.35,1)}
-    100%{transform:translateY(178px)}}
-  .lead{font-family:var(--serif);font-size:1.1875rem;line-height:1.5;margin-top:1rem}
-  .card{background:var(--raised);border:1px solid var(--line);border-radius:.75rem;padding:1.25rem 1rem;margin-top:1.25rem}
-  .etichetta{font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin:1rem 0 .5rem}
-  .etichetta:first-child{margin-top:0}
-  .row{display:flex;gap:.5rem}
-  .pill{flex:1;min-width:0;min-height:2.75rem;padding:.5rem .25rem;border-radius:.5rem;border:1px solid var(--line2);
-        background:var(--ground);font-size:.9375rem;display:flex;flex-direction:column;align-items:center;
-        justify-content:center;gap:.1rem;transition:background .2s,border-color .2s}
-  .pill small{font-size:.75rem;color:var(--muted);white-space:nowrap}
-  .pill[aria-pressed="true"]{background:var(--terraDim);border-color:var(--terraDim);color:#FFF}
-  .pill[aria-pressed="true"] small{color:#F6E9E3}
-  .nota{font-size:.8125rem;line-height:1.55;color:var(--muted);margin-top:.5rem}
-  .sw{display:flex;width:100%;min-height:3rem;align-items:center;justify-content:space-between;gap:1rem;
-      padding:.625rem .75rem;border:1px solid var(--line);border-radius:.5rem;margin-bottom:.5rem;
-      text-align:left;background:var(--ground)}
-  .sw b{display:block;font-weight:500;font-size:.9375rem}
-  .sw small{display:block;font-size:.8125rem;color:var(--muted)}
-  .knob{flex:none;width:2.75rem;height:1.5rem;border-radius:999px;background:var(--line2);
-        display:flex;align-items:center;padding:3px;transition:background .2s}
-  .knob i{width:1.125rem;height:1.125rem;border-radius:50%;background:#FFF;
-          box-shadow:0 1px 2px rgba(41,38,31,.25);transition:transform .2s}
-  .sw[aria-checked="true"] .knob{background:var(--terraDim)}
-  .sw[aria-checked="true"] .knob i{transform:translateX(1.25rem)}
-  .vol{display:flex;align-items:center;gap:.75rem;min-height:2.75rem;padding:0 .75rem;margin-bottom:.5rem}
-  .vol label{font-size:.875rem;color:var(--muted)}
-  .vol input{flex:1;min-width:0;height:2.75rem;accent-color:var(--terraDim)}
-  .vol output{font-size:.8125rem;color:var(--muted);min-width:2.5rem;text-align:right;font-variant-numeric:tabular-nums}
-  .vol.spento{opacity:.45}
-  .voceRiga{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin:.25rem 0 .5rem}
-  .voceRiga .nota{margin:0}
-  .nota.ok::before{content:'';display:inline-block;width:.5rem;height:.5rem;border-radius:50%;background:var(--terra);margin-right:.4rem}
-  .nota.allarme{color:var(--porpora)}
-  .mini{flex:none;min-height:2.75rem;padding:.5rem .875rem;border-radius:999px;border:1px solid var(--line2);
-        background:var(--raised);font-size:.8125rem;color:var(--terraDim)}
-  .primario{display:block;width:100%;min-height:3.25rem;margin-top:1.25rem;border-radius:999px;
-            background:var(--terraDim);color:#FFF;font-size:.9375rem;font-weight:500;
-            letter-spacing:.2em;text-transform:uppercase}
-  .primario:disabled{opacity:.7}
-  .fisso{position:sticky;bottom:calc(.75rem + env(safe-area-inset-bottom));z-index:2;
-         box-shadow:0 .5rem 1.25rem rgba(163,78,53,.28)}
-  .secondario{min-height:2.75rem;min-width:7.5rem;padding:.625rem 1.5rem;border-radius:999px;
-              border:1px solid var(--line2);background:var(--raised);font-size:.8125rem;
-              letter-spacing:.18em;text-transform:uppercase}
-  .avviso{border:1px solid var(--porpora);border-radius:.75rem;padding:1rem;margin-top:1.5rem;
-          background:var(--raised);font-family:var(--serif);font-size:1.1875rem;line-height:1.4;color:var(--porpora)}
-  .sez{margin-top:3rem;padding-top:2rem;border-top:1px solid var(--line)}
-  .sez h2{font-family:var(--serif);font-weight:400;font-size:1.875rem;line-height:1.15;margin-bottom:1rem}
-  .sez p{margin-bottom:.75rem}
-  .sez ul{padding-left:1.15rem;margin-bottom:.75rem}
-  .sez li{margin-bottom:.375rem}
-  /* diario */
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1.25rem}
-  .stat{background:var(--raised);border:1px solid var(--line);border-radius:.5rem;padding:.75rem .375rem;text-align:center}
-  .stat b{display:block;font-family:var(--serif);font-size:2.125rem;font-weight:400;line-height:1.1;
-          color:var(--porpora);font-variant-numeric:tabular-nums}
-  .stat span{display:block;font-size:.75rem;line-height:1.3;color:var(--muted)}
-  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:.375rem}
-  .cal .wd{font-size:.6875rem;color:var(--muted);text-align:center;letter-spacing:.08em}
-  .g{aspect-ratio:1;border-radius:.375rem;border:1px solid var(--line);background:var(--raised);
-     display:flex;align-items:center;justify-content:center;font-size:.75rem;color:var(--muted);
-     font-variant-numeric:tabular-nums}
-  .g.on{background:var(--terraDim);border-color:var(--terraDim);color:#FFF}
-  .g.oggi{outline:2px solid var(--porpora);outline-offset:1px}
-  .legenda{display:flex;flex-wrap:wrap;gap:.25rem 1rem;margin-top:.75rem;font-size:.75rem;color:var(--muted)}
-  .legenda i{display:inline-block;width:.75rem;height:.75rem;border-radius:.2rem;vertical-align:-.1rem;
-             margin-right:.35rem;border:1px solid var(--line);background:var(--raised)}
-  .legenda i.on{background:var(--terraDim);border-color:var(--terraDim)}
-  /* come si fa: tre anfore */
-  .passi{list-style:none;display:grid;gap:.75rem;margin-bottom:1rem}
-  .passo{display:grid;grid-template-columns:4.25rem 1fr;gap:1rem;align-items:center;background:var(--raised);
-         border:1px solid var(--line);border-radius:.75rem;padding:.875rem 1rem}
-  .passo svg{width:100%;height:auto;display:block}
-  .passo h3{font-family:var(--serif);font-weight:500;font-size:1.25rem;line-height:1.2;margin-bottom:.25rem}
-  .passo h3 span{color:var(--terraDim)}
-  .passo p{font-size:.9375rem;margin:0}
-  .cautela{border-left:3px solid var(--porpora);background:var(--raised);border-radius:0 .5rem .5rem 0;
-           padding:1rem 1rem 1rem 1.25rem}
-  .cautela p:last-child{margin-bottom:0}
-  .piede{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--line);font-size:.8125rem;color:var(--muted)}
-  .link{min-height:2.75rem;padding:.5rem 0;color:var(--terraDim);text-decoration:underline}
-  /* sessione */
-  .schermo{position:fixed;inset:0;z-index:10;background:var(--ground);display:flex;flex-direction:column;overflow:auto}
-  .barra{display:flex;justify-content:space-between;align-items:center;gap:1rem;min-height:3rem;
-         padding:calc(.875rem + env(safe-area-inset-top)) 1.25rem 0}
-  .barra b{font-weight:400;color:var(--text);font-variant-numeric:tabular-nums}
-  .chipRiga{display:flex;justify-content:center;align-items:center;min-height:2.75rem;padding:0 1.25rem}
-  .chip{display:inline-flex;align-items:center;gap:.45rem;min-height:2.25rem;padding:.3rem .875rem;border-radius:999px;
-        border:1px solid var(--line);background:var(--raised);font-size:.8125rem;color:var(--muted);text-align:left}
-  .chip::before{content:'';flex:none;width:.5rem;height:.5rem;border-radius:50%;background:var(--terra)}
-  .chip.attesa::before{background:var(--line2)}
-  .chip.allarme{min-height:2.75rem;color:var(--porpora);border-color:var(--porpora);font-weight:500}
-  .chip.allarme::before{background:var(--porpora)}
-  .centro{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-          gap:1.25rem;padding:1rem 1.25rem;text-align:center}
-  .sess{gap:.625rem;padding-top:0}
-  .anfora-big{width:min(68vw,17.5rem,34vh);height:auto;display:block;flex:none}
-  .fase{position:relative;font-family:var(--serif);font-size:clamp(1.75rem,7.5vw,2.375rem);line-height:1.2;min-height:2.5em;
-        width:100%;max-width:20rem;display:flex;align-items:center;justify-content:center}
-  .fase span{position:absolute;left:50%;top:50%;width:100%;transform:translate(-50%,-50%);opacity:0;transition:opacity .6s ease}
-  .binario{width:100%;max-width:19rem;height:auto;display:block}
-  .binario text{font-family:var(--serif);font-style:italic;font-size:13px;fill:#6b6355;text-anchor:middle}
-  .binario text.on{fill:#7A2E3C;font-weight:700}
-  .avanz{width:100%;max-width:19rem;height:3px;background:var(--line);border-radius:99px;overflow:hidden}
-  .avanz div{height:100%;width:0;background:var(--terra)}
-  .comandi{display:flex;gap:.75rem;justify-content:center;padding:.5rem 1.25rem calc(1.75rem + env(safe-area-inset-bottom))}
-  .stop{color:var(--porpora);border-color:var(--porpora)}
-  /* fine */
-  .fine .eyebrow{font-family:var(--sans);font-size:.75rem}
-  #fineTitolo:focus{outline:none}
-  .anfora-fine{width:8.5rem;height:auto;display:block}
-  .fine h2{font-family:var(--serif);font-weight:400;font-size:2.25rem;line-height:1.15}
-  .fine p{font-family:var(--serif);font-size:1.25rem;line-height:1.45;max-width:20rem}
-  .punti{display:flex;gap:.875rem;justify-content:center;margin-top:.75rem}
-  .punto{width:.75rem;height:.75rem;border-radius:50%;border:1px solid var(--terraDim);transition:background .6s}
-  .punto.on{background:var(--terraDim)}
-  .riep{font-family:var(--sans)!important;font-size:.9375rem!important;color:var(--muted)}
-  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important}
-    .emblema .liq-g{transform:translateY(80px)}
-    .fase span{transition:opacity .9s ease!important}
-    .pill,.knob,.knob i,.sw,.punto{transition:none!important}}
+:root{--carta:#F3EEE4;--inchiostro:#16162A;--grigio:#6A6878;--naso:#2B4BFF;--sorso:#FF5A2E;--bocca:#00876A;
+ --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;--sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+ --mono:ui-monospace,Menlo,Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--carta);color:var(--inchiostro);font-family:var(--sans);overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--inchiostro);outline-offset:3px}
+#mare{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
+.vista{position:relative;z-index:1;max-width:420px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;
+ padding:calc(1.2rem + env(safe-area-inset-top)) 1.2rem calc(1.2rem + env(safe-area-inset-bottom))}
+.occhiello{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--grigio)}
+h1{font-family:var(--serif);font-weight:400;font-size:3.1rem;line-height:.9;letter-spacing:-.03em;margin-top:.6rem}
+h1 i{color:var(--sorso)}
+.lead{margin-top:1rem;font-size:1.02rem;line-height:1.5;color:#3d3c4e}
+.tre{display:grid;grid-template-columns:1fr 1fr 2fr;gap:.4rem;margin-top:1.3rem}
+.tre div{border:1.5px solid var(--inchiostro);border-radius:14px;padding:.55rem .6rem;background:rgba(255,255,255,.55)}
+.tre b{display:block;font-family:var(--serif);font-size:1.25rem;font-weight:400}
+.tre small{font-size:.72rem;color:var(--grigio);line-height:1.25;display:block}
+.tre div:nth-child(1) b{color:var(--naso)}.tre div:nth-child(2) b{color:var(--sorso)}.tre div:nth-child(3) b{color:var(--bocca)}
+.lbl{font-family:var(--mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--grigio);margin:1.2rem 0 .45rem}
+.seg{display:flex;gap:.4rem}
+.seg button{flex:1;min-width:0;min-height:2.9rem;border:1.5px solid var(--inchiostro);border-radius:999px;font-weight:600;font-size:.9rem;background:rgba(255,255,255,.5)}
+.seg button small{display:block;font-weight:400;font-size:.62rem;font-family:var(--mono);color:var(--grigio)}
+.seg button[aria-pressed=true]{background:var(--inchiostro);color:var(--carta)}
+.seg button[aria-pressed=true] small{color:#cfcbe0}
+.diario{margin-top:1.3rem;display:flex;gap:.5rem;align-items:center;font-size:.85rem;color:var(--grigio)}
+.diario b{font-family:var(--serif);font-size:1.6rem;font-weight:400;color:var(--inchiostro)}
+.punti{display:flex;gap:4px;margin-left:auto}
+.punti i{width:10px;height:10px;border-radius:50%;border:1px solid #b9b1a0}
+.punti i.on{background:var(--bocca);border-color:var(--bocca)}
+.spazio{flex:1;min-height:1.2rem}
+.vai{width:100%;min-height:3.4rem;border-radius:999px;border:1.5px solid var(--inchiostro);background:var(--sorso);font-weight:700;font-size:1.05rem;box-shadow:3px 3px 0 var(--inchiostro)}
+.nota{font-size:.75rem;color:var(--grigio);margin-top:.8rem;line-height:1.45}
+/* sessione */
+#sess .alto{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase}
+.parola{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.4rem}
+.parola strong{font-family:var(--serif);font-weight:400;font-size:clamp(4rem,22vw,6.2rem);line-height:1;letter-spacing:-.02em;
+ transition:letter-spacing 1.2s ease,color .8s ease}
+.parola span{font-size:1.05rem;color:#3d3c4e;min-height:1.4em}
+#sess[data-f=out] .parola strong{letter-spacing:.12em;font-style:italic}
+.basso{display:flex;gap:.6rem;justify-content:center}
+.basso button{min-height:2.9rem;min-width:7.5rem;border-radius:999px;border:1.5px solid var(--inchiostro);background:rgba(255,255,255,.7);font-weight:600}
+.basso .stop{color:#B3122F;border-color:#B3122F}
+.barra{height:4px;border-radius:4px;background:rgba(22,22,42,.12);margin:.8rem 0 1rem;overflow:hidden}
+.barra div{height:100%;width:0;background:var(--inchiostro)}
+#fine .parola strong{font-size:clamp(2.6rem,13vw,3.6rem)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
+<canvas id="mare" aria-hidden="true"></canvas>
 
-<main id="intro" class="wrap">
-  <header>
-    <p class="eyebrow">Cyclic sighing · 5 minuti al giorno</p>
-    <div class="testa">
-      <h1 class="titolo">Sospiro<br><em>ciclico</em></h1>
-      <svg id="emblema" class="emblema" viewBox="0 0 240 300" aria-hidden="true"></svg>
-    </div>
-  </header>
-  <p class="lead">Due inspirazioni dal naso, una lunga espirazione dalla bocca.<br>
-    Cinque minuti al giorno, seduto o sdraiato. Nient'altro.</p>
-
-  <p id="seraAvviso" class="avviso" hidden>È sera. Fallo a letto, a luce spenta: cinque minuti di sospiri, poi dormi.</p>
-
-  <section class="card" aria-label="Impostazioni della sessione">
-    <p class="etichetta" id="lblDurata">Durata</p>
-    <div class="row" role="group" aria-labelledby="lblDurata">
-      <button class="pill" data-durata="3">3 min</button>
-      <button class="pill" data-durata="5">5 min</button>
-      <button class="pill" data-durata="10">10 min</button>
-    </div>
-
-    <p class="etichetta" id="lblRitmo">Ritmo</p>
-    <div class="row" role="group" aria-labelledby="lblRitmo">
-      <button class="pill" data-ritmo="dolce"><span>Dolce</span><small>4 + 1,2 + 7 s</small></button>
-      <button class="pill" data-ritmo="standard"><span>Standard</span><small>3 + 1,2 + 6 s</small></button>
-      <button class="pill" data-ritmo="lungo"><span>Lungo</span><small>5 + 1,2 + 10 s</small></button>
-    </div>
-    <p id="pianoTesto" class="nota"></p>
-
-    <p class="etichetta" id="lblVoce">Guida</p>
-    <button class="sw" role="switch" data-t="voce" aria-checked="false">
-      <span><b>Voce</b><small>Isabella ed Elsa, solo nei primi 3 cicli</small></span>
-      <span class="knob" aria-hidden="true"><i></i></span></button>
-    <div class="row" id="voceSceltaRiga" role="group" aria-labelledby="lblVoce" style="margin-bottom:.5rem">
-      <button class="pill" data-voce="isabella"><span>Isabella</span><small>voce calda</small></button>
-      <button class="pill" data-voce="elsa"><span>Elsa</span><small>voce chiara</small></button>
-      <button class="pill" data-voce="alternate"><span>Alternate</span><small>un ciclo ciascuna</small></button>
-    </div>
-    <div class="voceRiga" id="voceRiga">
-      <p id="voceStato" class="nota" role="status">La voce si carica…</p>
-      <button id="provaVoce" class="mini">Ascolta</button>
-    </div>
-    <button class="sw" role="switch" data-t="suono" aria-checked="false">
-      <span><b>Suono</b><small>Un tono morbido che segue il respiro</small></span>
-      <span class="knob" aria-hidden="true"><i></i></span></button>
-    <div class="vol" id="volRiga">
-      <label for="volume">Volume</label>
-      <input type="range" id="volume" min="0" max="100" step="5" value="60">
-      <output id="volOut" for="volume">60%</output>
-    </div>
-    <button class="sw" role="switch" data-t="vibra" aria-checked="false">
-      <span><b>Vibrazione</b><small id="vibraNota">Un tocco al secondo sorso, se il telefono lo supporta</small></span>
-      <span class="knob" aria-hidden="true"><i></i></span></button>
-
-    <button id="inizia" class="primario fisso">Inizia</button>
-  </section>
-
-  <section class="sez" aria-labelledby="hDiario">
-    <h2 id="hDiario">Diario</h2>
-    <div class="stats">
-      <div class="stat"><b id="stGiorni">0</b><span>giorni di pratica</span></div>
-      <div class="stat"><b id="stSerie">0</b><span id="stSerieU">giorni di fila</span></div>
-      <div class="stat"><b id="stMinuti">0</b><span>minuti in tutto</span></div>
-    </div>
-    <p class="etichetta">Ultimi 28 giorni</p>
-    <div id="cal" class="cal" role="img" aria-label="Ultimi 28 giorni"></div>
-    <div class="legenda" aria-hidden="true">
-      <span><i class="on"></i>con pratica</span><span><i></i>senza</span><span>bordo scuro = oggi</span>
-    </div>
-    <p class="nota">Conta ogni sessione di almeno un minuto. La serie resta viva fino a stasera anche se oggi non hai ancora fatto.</p>
-  </section>
-
-  <section class="sez" aria-labelledby="hCome">
-    <h2 id="hCome">Come si fa</h2>
-    <p>Immagina un'anfora. L'inspirazione riempie la pancia, il sorso arriva fino al collo,
-      l'espirazione la svuota piano dalla bocca. Un ciclo dura una decina di secondi e si ripete, senza pause.</p>
-    <ol class="passi">
-      <li class="passo">
-        <svg class="passoAnfora" data-v=".62" viewBox="0 0 240 300" aria-hidden="true"></svg>
-        <div><h3><span>1.</span> Inspira dal naso</h3>
-          <p>Un respiro normale, senza forzare. I polmoni si riempiono quasi del tutto.</p></div>
-      </li>
-      <li class="passo">
-        <svg class="passoAnfora" data-v="1" viewBox="0 0 240 300" aria-hidden="true"></svg>
-        <div><h3><span>2.</span> Ancora un sorso</h3>
-          <p>Subito dopo, senza fermarti, una seconda inspirazione breve dal naso: riempie fino in fondo.</p></div>
-      </li>
-      <li class="passo">
-        <svg class="passoAnfora" data-v=".3" data-aria="1" viewBox="0 0 240 300" aria-hidden="true"></svg>
-        <div><h3><span>3.</span> Espira lentamente dalla bocca</h3>
-          <p>Lascia uscire tutta l'aria, piano, fino in fondo. Dura circa il doppio dell'inspirazione: è la parte che conta di più.</p></div>
-      </li>
-    </ol>
-    <p class="nota">Se ti gira la testa o senti formicolii, passa al ritmo Dolce o fermati e respira come viene.</p>
-  </section>
-
-  <section class="sez" aria-labelledby="hRicerca">
-    <h2 id="hRicerca">Cosa dice la ricerca</h2>
-    <p>Nel 2023 un gruppo della Stanford University (Balban, Spiegel, Huberman e colleghi) ha pubblicato su
-      <i>Cell Reports Medicine</i> uno studio randomizzato fatto a distanza: circa 110 adulti, cinque minuti al giorno
-      per un mese, divisi in quattro gruppi. Sospiro ciclico, <i>box breathing</i>, iperventilazione ciclica con apnea,
-      meditazione mindfulness.</p>
-    <p><b>Cosa hanno misurato.</b> L'umore, con questionari quotidiani su emozioni positive, negative e ansia.
-      E, con un sensore da polso, frequenza respiratoria, frequenza cardiaca e variabilità cardiaca.</p>
-    <p><b>Cosa hanno trovato.</b></p>
-    <ul>
-      <li>Il sospiro ciclico ha dato il miglioramento più grande dell'umore positivo, più della meditazione.</li>
-      <li>Ha abbassato la frequenza respiratoria a riposo più della meditazione.</li>
-      <li>Il beneficio cresceva con i giorni di pratica.</li>
-      <li>Emozioni negative e ansia sono calate in tutti i gruppi, meditazione compresa: qui il sospiro non ha fatto meglio.</li>
-      <li>Frequenza cardiaca e variabilità cardiaca: nessuna differenza significativa.</li>
-    </ul>
-    <p><b>Cosa non ha misurato: il cortisolo.</b> Chi dice che il sospiro ciclico «abbassa il cortisolo»
-      non lo ricava da questo studio.</p>
-    <p><b>Limiti.</b> Un solo studio, un campione piccolo, un mese. L'umore lo hanno riferito i partecipanti stessi,
-      e non c'era un gruppo che non facesse nulla.</p>
-    <p class="nota">Balban M.Y. et al., «Brief structured respiration practices enhance mood and reduce physiological
-      arousal», <i>Cell Reports Medicine</i> 4, 100895 (2023).
-      <a href="https://doi.org/10.1016/j.xcrm.2022.100895" target="_blank" rel="noopener">Leggi lo studio ↗</a></p>
-  </section>
-
-  <section class="sez" aria-labelledby="hSera">
-    <h2 id="hSera">La sera, a letto</h2>
-    <p>Il momento più facile è a letto, prima di dormire: luce spenta, schiena giù, cinque minuti di sospiri e poi sonno.
-      Con voce e suono attivi puoi tenere gli occhi chiusi: la voce ti accompagna nei primi cicli, poi basta il tono.</p>
-    <p class="nota">Nessuna notifica: l'app non manda promemoria. Se vuoi, attiva un avviso solo testo che compare
-      in questa pagina dopo le 19, finché non hai fatto la pratica del giorno.</p>
-    <button class="sw" role="switch" data-t="sera" aria-checked="false">
-      <span><b>Promemoria serale</b><small>Solo un testo su questa pagina, la sera</small></span>
-      <span class="knob" aria-hidden="true"><i></i></span></button>
-  </section>
-
-  <section class="sez" aria-labelledby="hCautela">
-    <h2 id="hCautela">Con prudenza</h2>
-    <div class="cautela">
-      <p>Questa guida non sostituisce il parere di un medico.</p>
-      <p>Se hai asma grave, BPCO o attacchi di panico legati al respiro, vai piano: ritmo Dolce, pochi minuti,
-        e fermati se ti manca l'aria o ti gira la testa. Nel dubbio, chiedi prima al tuo medico.</p>
-    </div>
-  </section>
-
-  <footer class="piede">
-    <p>Nessun backend: il diario resta solo in questo browser (localStorage). Nessun dato viene inviato a nessuno.
-      I file della voce si scaricano da GitHub.</p>
-    <button id="azzera" class="link">Azzera il diario</button>
-  </footer>
+<main id="intro" class="vista">
+ <p class="occhiello">Cyclic sighing · marea</p>
+ <h1>Sospiro<br><i>ciclico</i></h1>
+ <p class="lead">Lo sfondo è il tuo respiro: la marea sale col naso, fa un'onda col sorso, si ritira piano dalla bocca. Segui l'acqua.</p>
+ <div class="tre" aria-label="Le tre fasi">
+  <div><b>Naso</b><small>inspira</small></div>
+  <div><b>Sorso</b><small>un piccolo extra</small></div>
+  <div><b>Bocca</b><small>espira lento, il doppio</small></div>
+ </div>
+ <p class="lbl" id="lD">Durata</p>
+ <div class="seg" role="group" aria-labelledby="lD" id="durate"></div>
+ <p class="lbl" id="lR">Ritmo</p>
+ <div class="seg" role="group" aria-labelledby="lR" id="ritmi"></div>
+ <p class="lbl" id="lV">Guida</p>
+ <div class="seg" role="group" aria-labelledby="lV" id="guide"></div>
+ <div class="diario"><b id="serie">0</b><span id="serieTxt">giorni di fila</span><div class="punti" id="punti" aria-hidden="true"></div></div>
+ <div class="spazio"></div>
+ <button class="vai" id="vai">Inizia</button>
+ <p class="nota">Se ti gira la testa, scegli Dolce o respira come viene. Non sostituisce il parere di un medico. Il diario resta solo in questo browser.</p>
 </main>
 
-<div id="sessione" class="schermo" role="dialog" aria-modal="true" aria-label="Sessione di respirazione" hidden>
-  <div class="barra">
-    <span class="eyebrow">Ciclo <b id="ciclo">1</b> / <b id="cicloTot">0</b></span>
-    <span class="eyebrow">Restano <b id="resto">0:00</b></span>
-  </div>
-  <div class="chipRiga" role="status" aria-live="polite"><button id="chip" class="chip" hidden></button></div>
-  <div class="centro sess">
-    <svg id="anfora" class="anfora-big" viewBox="0 0 240 300" aria-hidden="true"></svg>
-    <p id="faseTesto" class="fase" aria-live="polite" aria-atomic="true"><span style="opacity:1"></span><span></span></p>
-    <svg id="binario" class="binario" viewBox="0 0 300 80" aria-hidden="true"></svg>
-    <div class="avanz" aria-hidden="true"><div id="avanz"></div></div>
-  </div>
-  <div class="comandi">
-    <button id="pausa" class="secondario">Pausa</button>
-    <button id="stop" class="secondario stop">Stop</button>
-  </div>
-</div>
+<section id="sess" class="vista" role="dialog" aria-label="Sessione" hidden>
+ <div class="alto"><span>Ciclo <b id="nCiclo">1</b></span><span>Restano <b id="resto">0:00</b></span></div>
+ <div class="barra"><div id="avanz"></div></div>
+ <div class="parola" aria-live="polite"><strong id="parola">Pronto</strong><span id="sotto">mettiti comodo</span></div>
+ <div class="basso"><button id="pausa">Pausa</button><button id="stop" class="stop">Stop</button></div>
+</section>
 
-<div id="fine" class="schermo fine" role="dialog" aria-modal="true" aria-labelledby="fineTitolo" hidden>
-  <div class="centro">
-    <svg id="anforaFine" class="anfora-fine" viewBox="0 0 240 300" aria-hidden="true"></svg>
-    <p class="eyebrow">Fatto</p>
-    <h2 id="fineTitolo" tabindex="-1">Hai fatto 0 cicli</h2>
-    <p id="fineNota" class="riep" hidden></p>
-    <div id="silenzio">
-      <p>Ora resta in silenzio.<br>Respira come viene.</p>
-      <div class="punti" aria-hidden="true"><span class="punto"></span><span class="punto"></span><span class="punto"></span></div>
-      <p class="sr">Tre secondi di silenzio.</p>
-    </div>
-    <div id="dopo" hidden>
-      <p>Bene così.</p>
-      <p id="riepilogo" class="riep" style="margin-top:.5rem"></p>
-      <button id="torna" class="primario" style="width:auto;padding:0 3rem;margin:1.75rem auto 0">Torna</button>
-    </div>
-  </div>
-</div>
+<section id="fine" class="vista" role="dialog" aria-labelledby="fT" hidden>
+ <div class="parola"><strong id="fT" tabindex="-1">Fatto</strong><span id="fS"></span></div>
+ <div class="basso"><button id="torna">Torna</button></div>
+</section>
 
 <script>
 'use strict';
-/* ─────────────── ritmi e testi ─────────────── */
-const RITMI={
- dolce:{nome:'Dolce',in:4,sorso:1.2,out:7},
- standard:{nome:'Standard',in:3,sorso:1.2,out:6},
- lungo:{nome:'Lungo',in:5,sorso:1.2,out:10}};
-const DURATE=[3,5,10];
-const TESTI={in:'Inspira dal naso',sorso:'Ancora un sorso',out:'Espira lentamente dalla bocca',svuota:'Svuota tutto',
- intro:'Mettiti comodo, spalle sciolte',fine:'Bene così, respira normalmente',pausa:'In pausa'};
-const VOCE_CICLI=3;           // la voce guida solo i primi cicli, poi silenzio
-const SCALA={min:.42,mid:.8,max:1}; // scala storica del volume: la usa il test numerico CURVA_OK
-const SILENZIO_MS=3000;
-const MIN_SEC_DIARIO=60;      // sotto il minuto la sessione non entra nel diario
-const SORSO_ANTICIPO=.35;     // testo, voce, click e spinta del sorso partono 0,35 s prima della fine nominale dell'inspiro
-const SALITA=.4;              // quota dell'inspiro in cui il flusso d'aria arriva a regime
-const SPINTA=1;               // la campana del sorso: +56% di flusso sopra la tenuta, mai un calo prima della cima
-const PREP=3.2;               // preparazione prima del primo ciclo (frase iniziale), fuori dal timer
-const DUCK=.3;                // mentre parla la voce i toni scendono a 0,3 (−10 dB)
-const MAX_ATTESA_VOCE=.8;     // una frase aspetta al massimo 0,8 s che finisca la precedente, poi si salta
-const AUDIO_BASE='https://raw.githubusercontent.com/bifulcma/cyclic-sighing/main/audio/';
-const FRASI=['intro','in','sorso','out','svuota','fine'];
-const NOMI_VOCE={isabella:'Isabella',elsa:'Elsa',alternate:'Isabella ed Elsa'};
-
-/* ─────────────── stato e piccole utilities ─────────────── */
-const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:v;}catch(e){return d;}};
-const lsSet=(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}};
-const lsJSON=(k,d)=>{try{const v=lsGet(k,null);if(v===null)return d;const o=JSON.parse(v);
-  return o&&typeof o==='object'&&!Array.isArray(o)?o:d;}catch(e){return d;}};
-const PREF0={durata:5,ritmo:'standard',voce:true,voceScelta:'alternate',suono:true,volume:.6,vibra:false,sera:false};
-const S={...PREF0,...lsJSON('cyclic:pref',{}),log:lsJSON('cyclic:log',{})};
-if(!RITMI[S.ritmo])S.ritmo=PREF0.ritmo;
-if(!DURATE.includes(S.durata))S.durata=PREF0.durata;
-if(!NOMI_VOCE[S.voceScelta])S.voceScelta=PREF0.voceScelta;
-S.volume=Math.min(1,Math.max(0,+S.volume||0));
-['voce','suono','vibra','sera'].forEach(k=>{S[k]=!!S[k];});
-Object.keys(S.log).forEach(k=>{const v=S.log[k];   // scarta voci rovinate
- if(!/^\d{4}-\d\d-\d\d$/.test(k)||!v||typeof v!=='object'||!(+v.sec>0))delete S.log[k];});
-const salva=()=>{
- lsSet('cyclic:log',JSON.stringify(S.log));
- lsSet('cyclic:pref',JSON.stringify({durata:S.durata,ritmo:S.ritmo,voce:S.voce,voceScelta:S.voceScelta,
-   suono:S.suono,volume:S.volume,vibra:S.vibra,sera:S.sera}));
-};
-
 const $=id=>document.getElementById(id);
-const num=n=>String(n).replace('.',',');
+const RITMI={dolce:{n:'Dolce',naso:2,pausa:.3,sorso:.8,bocca:5.6},standard:{n:'Standard',naso:2.5,pausa:.3,sorso:1,bocca:7},lungo:{n:'Lungo',naso:3.5,pausa:.3,sorso:1.2,bocca:9.4}};
+const DURATE=[2,5,10];
+const GUIDE={muta:'Silenzio',isabella:'Isabella',elsa:'Elsa'};
+const AUDIO='https://raw.githubusercontent.com/bifulcma/cyclic-sighing/0afe6eef074fa7547ac2b88372b30b9d88c2115d/audio/';
+const TXT={naso:['Naso','inspira'],pausa:['Naso','tieni pieno'],sorso:['Sorso','ancora un po’'],bocca:['Bocca','lascia andare, piano']};
+const ls=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const S=Object.assign({durata:5,ritmo:'standard',guida:'isabella'},ls('marea:pref',{}));
+const LOG=ls('marea:log',{});
+const ridotto=matchMedia('(prefers-reduced-motion: reduce)');
+const dIso=o=>{const d=new Date();d.setHours(12);d.setDate(d.getDate()+o);return d.toISOString().slice(0,10)};
 const mmss=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
-const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-const giorno=off=>{const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+off);return d;}; // mezzogiorno: niente sorprese col cambio ora
-const oggi=()=>iso(giorno(0));
-const mqRidotto=(()=>{try{return window.matchMedia?matchMedia('(prefers-reduced-motion: reduce)'):null;}catch(e){return null;}})();
-const ridotto=()=>!!(mqRidotto&&mqRidotto.matches);
-const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
-const attesa=ms=>new Promise(r=>setTimeout(r,ms));
-const f1=n=>n.toFixed(1);
-const IOS_SENZA_SESSIONE=/iP(hone|ad|od)/.test(navigator.userAgent||'')&&!('audioSession'in navigator);
 
-/* ─────────────── tempi e curva del respiro ─────────────── */
-const durCiclo=r=>r.in+r.sorso+r.out;
-function piano(minuti,r){ // cicli interi: il timer finisce sempre a fine espirazione
- const L=durCiclo(r),n=Math.max(1,Math.round(minuti*60/L));
- return {cicli:n,totale:n*L};
-}
-// fasi nominali (il ritmo scelto); el<0 è la preparazione
-function faseA(el,r){
- if(el<0)return {ciclo:0,tc:0,fase:'prep',t:el+PREP,dur:PREP};
- const L=durCiclo(r),ciclo=Math.floor(el/L+1e-12),tc=el-ciclo*L;
- if(tc<r.in)return {ciclo,tc,fase:'in',t:tc,dur:r.in};
- if(tc<r.in+r.sorso)return {ciclo,tc,fase:'sorso',t:tc-r.in,dur:r.sorso};
- return {ciclo,tc,fase:'out',t:tc-r.in-r.sorso,dur:r.out};
-}
-// fase mostrata e guidata: il sorso parte con SORSO_ANTICIPO, così chi ascolta ci arriva in tempo
-const faseUI=(tc,r)=>tc<r.in-SORSO_ANTICIPO?'in':tc<r.in+r.sorso?'sorso':'out';
-const cueCiclo=r=>[{k:'in',t:0},{k:'sorso',t:r.in-SORSO_ANTICIPO},{k:'out',t:r.in+r.sorso},{k:'svuota',t:r.in+r.sorso+r.out*.62}];
-
-// Volume d'aria 0→1→0 dentro il ciclo. Il flusso (la sua derivata) sale, tiene, e nel sorso riceve una spinta
-// che si spegne in cima: non cala MAI prima della cima, quindi tra inspiro e sorso non c'è nessun fermo.
-// Espirazione: flusso 12p(1−p)², parte morbida, scende lunga; tutte le giunture sono C1.
-const _S=x=>{x=clamp(x);return x*x*(3-2*x);};
-const _SI=x=>{x=clamp(x);return x*x*x-x*x*x*x/2;};                                  // ∫ smoothstep
-const _SIN2I=x=>{x=clamp(x);return x/2-Math.sin(2*Math.PI*x)/(4*Math.PI);};          // ∫ sin²(πu)
-function geoCiclo(r){
- const top=r.in+r.sorso,t2=r.in-SORSO_ANTICIPO,D=top-t2,tau=SALITA*r.in;
- return {top,t2,D,tau,tot:(t2-tau/2)+D/2+SPINTA*D/2};
-}
-function volumeCiclo(tc,r){
- const g=geoCiclo(r);
- if(tc>=g.top){const p=clamp((tc-g.top)/r.out);return Math.pow(1-p,3)*(1+3*p);}
- if(tc<=0)return 0;
- let a=tc<g.tau?g.tau*_SI(tc/g.tau):g.tau/2+(Math.min(tc,g.t2)-g.tau);
- if(tc>g.t2){const u=(tc-g.t2)/g.D;a+=g.D*(u-_SI(u))+SPINTA*g.D*_SIN2I(u);}
- return a/g.tot;
-}
-function flussoCiclo(tc,r){const h=.004,L=durCiclo(r),w=t=>((t%L)+L)%L;
- return (volumeCiclo(w(tc+h),r)-volumeCiclo(w(tc-h),r))/(2*h);}
-const scalaCiclo=(tc,r)=>SCALA.min+(SCALA.max-SCALA.min)*volumeCiclo(tc,r);
-
-/* ─────────────── l'anfora: profilo, livello, disegno ─────────────── */
-const ANF={cx:120,yB:262,yT:52,K:82,p:5};
-const largh=y=>.30+.70*Math.exp(-Math.pow((y-.37)/.27,2))+.13*Math.exp(-Math.pow((y-1)/.06,2));
-const yPx=y=>ANF.yB-y*(ANF.yB-ANF.yT);
-const xPx=(y,s,off=0)=>ANF.cx+s*(ANF.K*largh(y)+off);
-// livello dal volume: area cumulata del profilo → nel collo stretto lo stesso sorso alza molto il livello
-const LMIN=.05,LMAX=.965;
-const _AREA=(()=>{const N=600,A=new Float64Array(N+1);for(let i=1;i<=N;i++)A[i]=A[i-1]+largh((i-.5)/N)/N;return A;})();
-function livelloDaVolume(f){
- const A=_AREA,N=A.length-1,t=clamp(f)*A[N];let lo=0,hi=N;
- while(hi-lo>1){const m=(lo+hi)>>1;if(A[m]<t)lo=m;else hi=m;}
- return (lo+(t-A[lo])/((A[hi]-A[lo])||1))/N;
-}
-const livelloCiclo=(tc,r)=>livelloDaVolume(LMIN+(LMAX-LMIN)*volumeCiclo(tc,r));
-function contorno(off,chiuso=true){
- const N=64,sx=[],dx=[];
- for(let i=0;i<=N;i++){const y=1-i/N;sx.push(f1(xPx(y,-1,off))+' '+f1(yPx(y)));dx.unshift(f1(xPx(y,1,off))+' '+f1(yPx(y)));}
- const yb=f1(ANF.yB+off);
- return 'M'+sx.join(' L')+' L'+f1(xPx(0,-1,off))+' '+yb+' L'+f1(xPx(0,1,off))+' '+yb+' L'+dx.join(' L')+(chiuso?' Z':'');
-}
-function liquido(yL,amp,fase){
- const pts=[];
- for(let i=0;i<=24;i++){const x=24+i*8,y=yL+amp*(.62*Math.sin(x*.055+fase)+.38*Math.sin(x*.11-fase*1.7));pts.push(f1(x)+' '+f1(y));}
- return {d:'M24 '+(ANF.yB+20)+' L'+pts.join(' L')+' L216 '+(ANF.yB+20)+' Z',sup:'M'+pts.join(' L')};
-}
-function anforaSVG(id,{alone=true,aria=true}={}){
- const P_=ANF.p,ansa=s=>`M${f1(xPx(.58,s,P_-1))} ${f1(yPx(.58))} C${f1(xPx(.62,s,P_+36))} ${f1(yPx(.64))} ${f1(xPx(.9,s,P_+30))} ${f1(yPx(.95))} ${f1(xPx(.86,s,P_-1))} ${f1(yPx(.86))}`;
- const labbro=s=>`<ellipse cx="${f1(xPx(1,s,P_/2))}" cy="${ANF.yT}" rx="${P_/2+3}" ry="3.2" fill="#A34E35"/>`;
- const piede=ANF.K*largh(0)*.78,lq=liquido(yPx(1)-2,1.5,0);
- return `<defs>
-  <clipPath id="${id}-c"><path d="${contorno(0)}"/></clipPath>
-  <linearGradient id="${id}-l" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EDAE95"/><stop offset=".5" stop-color="#D47657"/><stop offset="1" stop-color="#A34E35"/></linearGradient>
-  <radialGradient id="${id}-h"><stop offset="0" stop-color="#E9A387" stop-opacity=".6"/><stop offset="1" stop-color="#E9A387" stop-opacity="0"/></radialGradient>
- </defs>
- ${alone?`<circle class="alone" cx="120" cy="168" r="116" fill="url(#${id}-h)" opacity=".2"/>`:''}
- <ellipse cx="120" cy="${ANF.yB+P_+13}" rx="74" ry="5" fill="#29261F" opacity=".07"/>
- <g fill="none" stroke="#A34E35" stroke-width="7" stroke-linecap="round"><path d="${ansa(-1)}"/><path d="${ansa(1)}"/></g>
- <path d="${contorno(P_)}" fill="#A34E35"/>
- <rect x="${f1(ANF.cx-piede)}" y="${ANF.yB+P_-1}" width="${f1(2*piede)}" height="11" rx="3" fill="#A34E35"/>
- ${labbro(-1)}${labbro(1)}
- <path d="${contorno(0)}" fill="#FFFCF8"/>
- <g clip-path="url(#${id}-c)">
-  <g class="liq-g"><path class="liq" fill="url(#${id}-l)" d="${lq.d}"/>
-   <path class="sup" fill="none" stroke="#FFF" stroke-opacity=".6" stroke-width="1.6" d="${lq.sup}"/></g>
-  <ellipse cx="${f1(ANF.cx-ANF.K*.52)}" cy="${f1(yPx(.42))}" rx="7" ry="60" fill="#FFF" opacity=".3"/>
- </g>
- <path d="${contorno(0,false)}" fill="none" stroke="#7A2E3C" stroke-opacity=".22" stroke-width="1"/>
- ${aria?`<g class="aria" fill="none" stroke="#C2664A" stroke-width="2.4" stroke-linecap="round" opacity="0">${[0,1,2].map(k=>
-   `<path data-k="${k}" d="M${110+k*5} 0 q5 -5 10 0 t10 0"/>`).join('')}</g>`:''}`;
-}
-// aggiorna livello, onda, alone e "aria che esce dalla bocca"
-function aggiornaAnfora(svg,{V,q=0,t=0,sorso=0,fermo=false}){
- if(!svg)return;
- const rid=ridotto(),qmax=.45,liv=livelloDaVolume(LMIN+(LMAX-LMIN)*(rid?.55:V));
- const amp=rid||fermo?0:(.7+3.4*clamp(Math.abs(q)/qmax))*Math.min(1,largh(liv)*1.7);
- const p=liquido(yPx(liv),amp,t*1.7),liq=svg.querySelector('.liq'),sup=svg.querySelector('.sup');
- if(liq){liq.setAttribute('d',p.d);liq.style.opacity=rid?(.36+.64*V).toFixed(3):'1';}
- if(sup)sup.setAttribute('d',p.sup);
- const al=svg.querySelector('.alone');if(al)al.setAttribute('opacity',(.1+.32*V+.12*sorso).toFixed(3));
- const ar=svg.querySelector('.aria');
- if(ar){const o=rid||fermo?0:clamp(-q/qmax*1.6);ar.setAttribute('opacity',o.toFixed(3));
-  if(o>0)ar.querySelectorAll('path').forEach(el=>{const k=+el.dataset.k,s=(t*11+k*8)%24;
-   el.setAttribute('transform',`translate(0 ${f1(ANF.yT-8-s)})`);el.setAttribute('opacity',(1-s/24).toFixed(3));});}
-}
-// il binario: la curva del ciclo, con le tre fasi in proporzione e un punto che la percorre
-function disegnaBinario(r){
- const L=durCiclo(r),X=t=>8+284*t/L,Y=v=>62-48*v,g=geoCiclo(r);let d='';
- for(let i=0;i<=160;i++){const t=L*i/160;d+=(i?' L':'M')+f1(X(t))+' '+f1(Y(volumeCiclo(t,r)));}
- $('binario').innerHTML=`<defs><clipPath id="binC"><rect id="binClip" x="0" y="0" width="0" height="80"/></clipPath></defs>
-  <line x1="8" y1="63" x2="292" y2="63" stroke="#E8E4DC"/>
-  ${[g.t2,g.top].map(t=>`<line x1="${f1(X(t))}" y1="8" x2="${f1(X(t))}" y2="63" stroke="#D6CFC2" stroke-dasharray="2 3"/>`).join('')}
-  <path d="${d}" fill="none" stroke="#D6CFC2" stroke-width="2"/>
-  <path d="${d}" fill="none" stroke="#C2664A" stroke-width="3.2" stroke-linecap="round" clip-path="url(#binC)"/>
-  <circle id="binPunto" r="5.5" cx="8" cy="62" fill="#A34E35" stroke="#FAF9F5" stroke-width="2"/>
-  <text data-f="in" x="${f1(X(g.t2/2))}" y="78">naso</text>
-  <text data-f="sorso" x="${f1(X((g.t2+g.top)/2))}" y="78">sorso</text>
-  <text data-f="out" x="${f1(X((g.top+L)/2))}" y="78">bocca</text>`;
- P.binX=X;P.binY=Y;
-}
-
-/* ─────────────── audio: un grafo solo, toni e voce su due bus ─────────────── */
-// toni → duck (si abbassa quando parla la voce) → master (volume) → limitatore → uscita
-// voce → voceBus (volume) → limitatore → uscita
-const AU={ctx:null,duck:null,master:null,voceBus:null,lim:null,toni:new Set(),orologio:null};
-function ac(){
- try{
-  if(!AU.ctx){
-   const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;
-   const a=AU.ctx=new C();
-   const lim=AU.lim=a.createDynamicsCompressor();
-   try{lim.threshold.value=-6;lim.knee.value=6;lim.ratio.value=12;lim.attack.value=.003;lim.release.value=.25;}catch(e){}
-   lim.connect(a.destination);
-   AU.master=a.createGain();AU.master.gain.value=S.volume*.88;AU.master.connect(lim);
-   AU.duck=a.createGain();AU.duck.gain.value=1;AU.duck.connect(AU.master);
-   AU.voceBus=a.createGain();AU.voceBus.gain.value=S.volume;AU.voceBus.connect(lim);
-  }
-  // 'suspended' e anche 'interrupted' (iPhone dopo una chiamata o lo schermo spento)
-  if(AU.ctx.state!=='running'&&AU.ctx.state!=='closed'){try{const p=AU.ctx.resume();if(p&&p.catch)p.catch(()=>{});}catch(e){}}
-  return AU.ctx;
- }catch(e){return null;}
-}
-// da chiamare DENTRO un tocco: sblocca audio e voce su iPhone
-function sblocca(){
- try{if(navigator.audioSession)navigator.audioSession.type='playback';}catch(e){} // iOS 17+: suona anche col tasto silenzioso
- const a=ac();
- if(a){try{const b=a.createBuffer(1,1,22050),s=a.createBufferSource();s.buffer=b;s.connect(a.destination);s.start(0);}catch(e){}}
- // se dovrà servire la voce del telefono, il primo speak deve nascere nel tocco (Safari)
- if(S.voce&&statoVoce()!=='pronta'&&'speechSynthesis'in window){
-  try{const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);}catch(e){}}
-}
-function impostaVolume(v){
- S.volume=clamp(v);
- try{const t=AU.ctx.currentTime;AU.master.gain.setTargetAtTime(S.volume*.88,t,.06);AU.voceBus.gain.setTargetAtTime(S.volume,t,.06);}catch(e){}
-}
-// Un tono UNICO per ciclo, con frequenza e volume programmati: nessun buco tra inspiro e sorso.
-const PICCO=.17;
-function curveTono(r){
- const g=geoCiclo(r),L=durCiclo(r);
- return {f:[[0,196],[g.t2,246.94],[g.top,293.66],[L,146.83]],
-  lp:[[0,820],[g.top,1000],[L,360]],
-  g:[[0,1e-4],[.35,PICCO],[g.t2,PICCO],[(g.t2+g.top)/2,PICCO*1.18],[g.top,PICCO*1.05],[g.top+r.out*.55,PICCO*.6],[L-.05,1e-4]]};
-}
-function interp(pts,t){
- if(t<=pts[0][0])return pts[0][1];
- for(let i=1;i<pts.length;i++){const [t0,v0]=pts[i-1],[t1,v1]=pts[i];
-  if(t<=t1)return v0*Math.pow(v1/v0,(t-t0)/(t1-t0));}
- return pts[pts.length-1][1];
-}
-// programma un parametro da tc=da in poi; con dolce=true parte da zero (ripresa a metà ciclo, niente click)
-function programma(param,pts,da,n,dolce){
- param.setValueAtTime(dolce?1e-4:interp(pts,da),n);
- let d0=da;
- if(dolce&&da>.01){d0=da+.2;param.linearRampToValueAtTime(interp(pts,d0),n+.2);}
- for(const [t,v] of pts)if(t>d0)param.exponentialRampToValueAtTime(v,n+(t-da));
-}
-function tonoCiclo(da){
- const a=AU.ctx;if(!a||!S.suono||a.state==='closed')return;
- const r=P.r,c=curveTono(r),resto=durCiclo(r)-da;if(resto<.12)return;
- sfumaToni(.15);
- const n=a.currentTime+.01,g=a.createGain(),lp=a.createBiquadFilter();
- lp.type='lowpass';lp.Q.value=.35;
- programma(g.gain,c.g,da,n,true);programma(lp.frequency,c.lp,da,n,false);
- lp.connect(g);g.connect(AU.duck);
- const osc=[['sine',1,1],['triangle',.5,.28]].map(([tipo,m,amp])=>{
-  const o=a.createOscillator(),og=a.createGain();o.type=tipo;
-  programma(o.frequency,c.f.map(([t,v])=>[t,v*m]),da,n,false);
-  og.gain.value=amp;o.connect(og);og.connect(lp);o.start(n);o.stop(n+resto+.05);return o;});
- const rec={g,lp,osc};AU.toni.add(rec);
- osc[0].onended=()=>{AU.toni.delete(rec);try{g.disconnect();lp.disconnect();}catch(e){}};
-}
-function sfumaToni(sec){
- const a=AU.ctx;if(!a)return;const t=a.currentTime;
- AU.toni.forEach(v=>{
-  try{const p=v.g.gain;if(p.cancelAndHoldAtTime)p.cancelAndHoldAtTime(t);else p.cancelScheduledValues(t);
-   p.setTargetAtTime(1e-4,t,Math.max(.03,sec/3));}catch(e){}
-  v.osc.forEach(o=>{try{o.stop(t+sec+.1);}catch(e){}});
- });
- AU.toni.clear();
-}
-function tonoBreve(f0,f1_){ // assaggio del volume
- const a=ac();if(!a)return;const n=a.currentTime+.02,o=a.createOscillator(),g=a.createGain();
- o.type='sine';o.frequency.setValueAtTime(f0,n);o.frequency.exponentialRampToValueAtTime(f1_,n+1.1);
- g.gain.setValueAtTime(1e-4,n);g.gain.exponentialRampToValueAtTime(PICCO,n+.25);g.gain.exponentialRampToValueAtTime(1e-4,n+1.15);
- o.connect(g);g.connect(AU.duck);o.start(n);o.stop(n+1.2);
-}
-function click(){
- const a=AU.ctx;if(!a||a.state!=='running')return;
- const n=a.currentTime+.005,o=a.createOscillator(),g=a.createGain();
- o.type='sine';o.frequency.setValueAtTime(1180,n);o.frequency.exponentialRampToValueAtTime(640,n+.07);
- g.gain.setValueAtTime(1e-4,n);g.gain.exponentialRampToValueAtTime(.12,n+.006);g.gain.exponentialRampToValueAtTime(1e-4,n+.11);
- o.connect(g);g.connect(AU.duck);o.start(n);o.stop(n+.13);
-}
-function silenzia(){sfumaToni(.25);zitto();}
-function vibra(){if(S.vibra&&navigator.vibrate){try{navigator.vibrate(35);}catch(e){}}}
-function abbassaToni(t0,t1){ // ducking: la voce sopra, i toni sotto
- const d=AU.duck&&AU.duck.gain;if(!d)return;
- try{d.cancelScheduledValues(t0);d.setTargetAtTime(DUCK,t0,.06);d.setTargetAtTime(1,t1+.12,.22);}catch(e){}
-}
-
-/* ─────────────── voce: MP3 edge-tts scaricati all'apertura, fallback alla voce del telefono ─────────────── */
-const VOICE={buf:new Map(),info:new Map(),carico:null,tentato:false,cur:null,fine:0,partite:[],saltate:0,errore:''};
-const OAC=window.OfflineAudioContext||window.webkitOfflineAudioContext;
-let _dec=null;
-function decodifica(ab){ // promessa anche con la vecchia API a callback di Safari
- return new Promise((ok,ko)=>{
-  try{
-   if(!_dec)_dec=AU.ctx||(OAC?new OAC(1,1,44100):null);
-   if(!_dec){ko(new Error('Web Audio assente'));return;}
-   const p=_dec.decodeAudioData(ab,ok,ko);if(p&&p.then)p.then(ok,ko);
-  }catch(e){ko(e);}
- });
-}
-// taglia il silenzio iniziale/finale dei file e uniforma il volume delle frasi
-function analizza(buf){
- const d=buf.getChannelData(0),sr=buf.sampleRate,soglia=.02;
- let i0=0,i1=d.length-1;
- while(i0<d.length&&Math.abs(d[i0])<soglia)i0++;
- while(i1>i0&&Math.abs(d[i1])<soglia)i1--;
- let s=0,n=0,pk=0;
- for(let i=i0;i<=i1;i++){const x=Math.abs(d[i]);if(x>pk)pk=x;if(x>.005){s+=x*x;n++;}}
- const rms=n?Math.sqrt(s/n):.1;
- return {da:Math.max(0,i0/sr-.04),a:Math.min(buf.duration,i1/sr+.1),gain:clamp(Math.min(.14/rms,.95/(pk||1)),.5,3)};
-}
-function vocePerFrase(chiave,ciclo){
- if(S.voceScelta!=='alternate')return S.voceScelta;
- if(chiave==='intro')return 'isabella';
- if(chiave==='fine')return 'elsa';
- return ciclo%2?'elsa':'isabella';
-}
-function listaFileVoce(){
- const voci=S.voceScelta==='alternate'?['isabella','elsa']:[S.voceScelta];
- const out=[];voci.forEach(v=>FRASI.forEach(f=>out.push(v+'-'+f+'.mp3')));return out;
-}
-function contaVoce(){const l=listaFileVoce();return {n:l.filter(x=>VOICE.buf.has(x)).length,tot:l.length};}
-function statoVoce(){
- const {n,tot}=contaVoce();
- if(n===tot)return 'pronta';
- if(VOICE.carico||!VOICE.tentato)return 'carico';
- return n>0?'parziale':'assente';
-}
-function precaricaVoce(){
- if(VOICE.carico)return VOICE.carico;
- const mancano=listaFileVoce().filter(n=>!VOICE.buf.has(n));
- if(!mancano.length){VOICE.tentato=true;aggiornaStatoVoce();return Promise.resolve();}
- VOICE.carico=Promise.all(mancano.map(async nome=>{
-  for(let tent=0;tent<2;tent++){
-   try{
-    const r=await fetch(AUDIO_BASE+nome,{mode:'cors'});
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const buf=await decodifica(await r.arrayBuffer());
-    VOICE.buf.set(nome,buf);VOICE.info.set(nome,analizza(buf));aggiornaStatoVoce();return;
-   }catch(e){VOICE.errore=nome+': '+(e&&e.message||e);if(!tent)await attesa(700);}
-  }
- })).then(()=>{VOICE.carico=null;VOICE.tentato=true;aggiornaStatoVoce();});
- aggiornaStatoVoce();
- return VOICE.carico;
-}
-function aggiornaStatoVoce(){
- const e=$('voceStato'),{n,tot}=contaVoce(),s=statoVoce();
- if(e){
-  let txt,cl='nota';
-  if(!S.voce)txt='Voce spenta.';
-  else if(s==='pronta'){txt='Voce pronta: '+NOMI_VOCE[S.voceScelta]+'.';cl+=' ok';}
-  else if(s==='carico')txt='Carico la voce… '+n+'/'+tot;
-  else if(s==='parziale'){txt='Voce incompleta ('+(tot-n)+' file non scaricati): per quelle frasi userò la voce del telefono.';cl+=' allarme';}
-  else {txt='File della voce non raggiungibili (sei offline?). Userò la voce del telefono, se c’è.';cl+=' allarme';}
-  if(S.voce&&s==='pronta'&&IOS_SENZA_SESSIONE)txt+=' Su iPhone togli il silenzioso.';
-  e.textContent=txt;e.className=cl;
-  const b=$('provaVoce');if(b)b.textContent=s==='assente'||s==='parziale'?'Riprova':'Ascolta';
- }
- if(P.stato==='attiva'||P.stato==='pausa')controllaAudio();
-}
-function parlaSistema(testo){
- if(!('speechSynthesis'in window))return false;
- try{
-  if(speechSynthesis.pending)speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(testo);u.lang='it-IT';u.rate=.95;u.pitch=1.03;u.volume=clamp(S.volume+.25);
-  const v=voceFem();if(v)u.voice=v;speechSynthesis.speak(u);
-  if(AU.ctx)abbassaToni(AU.ctx.currentTime,AU.ctx.currentTime+1.6);
-  return true;
- }catch(e){return false;}
-}
-let _voceFem=null;
-function voceFem(){
- if(_voceFem)return _voceFem;
- try{
-  const v=speechSynthesis.getVoices().filter(x=>x.lang&&x.lang.toLowerCase().replace('_','-').startsWith('it'));
-  const fem=v.find(x=>/isabella|elsa|alice|giulia|chiara|federica|paola|silvia|maria|anna|elisa|vittoria|female|donna/i.test(x.name));
-  _voceFem=fem||v.find(x=>!/luca|cosimo|diego|giorgio|paolo|marco|carlo|male/i.test(x.name))||v[0]||null;
- }catch(e){_voceFem=null;}
- return _voceFem;
-}
-if('speechSynthesis'in window)speechSynthesis.onvoiceschanged=()=>{_voceFem=null;};
-// una frase alla volta: se la precedente sta ancora parlando, questa aspetta (max 0,8 s) o si salta
-function parlaGuida(chiave,ciclo){
- if(!S.voce)return false;
- const nome=vocePerFrase(chiave,ciclo)+'-'+chiave+'.mp3',buf=VOICE.buf.get(nome),a=AU.ctx;
- if(buf&&a&&a.state==='running'){
-  const inf=VOICE.info.get(nome)||{da:0,a:buf.duration,gain:1};
-  let t=a.currentTime+.02;
-  if(VOICE.fine>t){if(VOICE.fine-t>MAX_ATTESA_VOCE){VOICE.saltate++;return false;}t=VOICE.fine+.04;}
-  try{
-   const dur=Math.max(.2,inf.a-inf.da),src=a.createBufferSource(),g=a.createGain();
-   src.buffer=buf;
-   g.gain.setValueAtTime(1e-4,t);g.gain.linearRampToValueAtTime(inf.gain,t+.04);
-   g.gain.setValueAtTime(inf.gain,t+Math.max(.05,dur-.1));g.gain.linearRampToValueAtTime(1e-4,t+dur);
-   src.connect(g);g.connect(AU.voceBus);src.start(t,inf.da,dur);
-   VOICE.cur={src,g};VOICE.fine=t+dur;VOICE.partite.push({nome,t,dur});
-   abbassaToni(t,t+dur);
-   src.onended=()=>{try{g.disconnect();src.disconnect();}catch(e){}};
-   return true;
-  }catch(e){}
- }
- return parlaSistema(TESTI[chiave]);
-}
-function zitto(){
- try{speechSynthesis.cancel();}catch(e){}
- const a=AU.ctx;if(!a)return;const t=a.currentTime;
- if(VOICE.cur){const {src,g}=VOICE.cur;try{g.gain.cancelScheduledValues(t);g.gain.setTargetAtTime(1e-4,t,.02);src.stop(t+.12);}catch(e){}VOICE.cur=null;}
- VOICE.fine=0;
- try{AU.duck.gain.cancelScheduledValues(t);AU.duck.gain.setTargetAtTime(1,t,.1);}catch(e){}
-}
-
-/* ─────────────── controllo a schermo: la voce è pronta? l'audio scorre? ─────────────── */
-let _chipOkFino=0,_oro=null;
-function ctxFermo(){ // l'AudioContext dice "running" ma il suo orologio non avanza
- const a=AU.ctx;if(!a||a.state!=='running'||P.stato!=='attiva'){_oro=null;return false;}
- const now=performance.now();
- if(!_oro||now-_oro.now>4000){_oro={now,ct:a.currentTime};return false;}
- if(now-_oro.now<900)return !!_oro.fermo;
- const fermo=(a.currentTime-_oro.ct)<.25*(now-_oro.now)/1000;
- _oro={now,ct:a.currentTime,fermo};return fermo;
-}
-function controllaAudio(avvio){
- const chip=$('chip');if(!chip)return;
- if(avvio)_chipOkFino=performance.now()+5000;
- const a=AU.ctx,serve=S.voce||S.suono,{n,tot}=contaVoce(),s=statoVoce();
- let txt='',tipo='ok';
- if(serve&&!a){txt='Questo browser non riproduce l’audio';tipo='allarme';}
- else if(serve&&(a.state!=='running'||ctxFermo())){txt='Audio bloccato dal telefono · tocca per riattivare';tipo='allarme';}
- else if(S.voce&&s==='carico'){txt='Voce in arrivo… '+n+'/'+tot;tipo='attesa';}
- else if(S.voce&&s==='parziale'){txt='Voce incompleta · alcune frasi con la voce del telefono';tipo='allarme';}
- else if(S.voce&&s==='assente'){txt='Voce non pronta · file non scaricati · tocca per riprovare';tipo='allarme';}
- else if(S.voce&&performance.now()<_chipOkFino)txt='Voce pronta'+(IOS_SENZA_SESSIONE?' · se non la senti, togli il silenzioso':'');
- chip.hidden=!txt;
- if(chip.textContent!==txt)chip.textContent=txt;
- chip.className='chip '+tipo;
-}
-
-/* ─────────────── wake lock ─────────────── */
-const P={stato:'ferma',r:null,cicli:0,totale:0,el:0,acc:0,t0:0,raf:0,elPrec:0,uiKey:'',toneCiclo:-1,wake:null,silT:[],ctrl:0,binX:null,binY:null};
-let wakeInCorso=false;
-async function wakeOn(){
- if(!('wakeLock'in navigator)||P.wake||wakeInCorso)return;wakeInCorso=true;
- try{const w=await navigator.wakeLock.request('screen');
-  if(P.stato!=='attiva'){Promise.resolve(w.release()).catch(()=>{});return;}
-  P.wake=w;w.addEventListener('release',()=>{if(P.wake===w)P.wake=null;});
- }catch(e){}finally{wakeInCorso=false;}
-}
-function wakeOff(){const w=P.wake;P.wake=null;if(w){try{Promise.resolve(w.release()).catch(()=>{});}catch(e){}}}
-
-/* ─────────────── schermate ─────────────── */
-function mostra(nome){
- $('sessione').hidden=nome!=='sessione';$('fine').hidden=nome!=='fine';const intro=$('intro');
- if(nome==='intro'){intro.removeAttribute('inert');intro.removeAttribute('aria-hidden');}
- else{intro.setAttribute('inert','');intro.setAttribute('aria-hidden','true');}
- document.documentElement.classList.toggle('chiuso',nome!=='intro');
-}
-/* testo di fase: due piani in dissolvenza incrociata, mai uno scatto */
-let _pianoTesto=0;
-function scriviFase(txt){
- const e=$('faseTesto');if(!e)return;let spans=e.querySelectorAll('span');
- if(!spans.length){e.innerHTML='<span></span><span></span>';spans=e.querySelectorAll('span');}
- if(spans[_pianoTesto].textContent===txt)return;
- const nuovo=_pianoTesto^1,cur=spans[_pianoTesto],nxt=spans[nuovo];
- nxt.textContent=txt;nxt.style.opacity='1';cur.style.opacity='0';_pianoTesto=nuovo;
- cur.addEventListener('transitionend',()=>{if(cur.style.opacity==='0')cur.textContent='';},{once:true});
-}
-
-/* ─────────────── sessione ─────────────── */
-async function onInizia(){
- if(P.stato!=='ferma')return;
- sblocca();                                   // nel tocco: audioSession, AudioContext, voce di sistema
- if(S.voce&&statoVoce()==='carico'){          // voce non ancora arrivata: aspetta un attimo, poi parte comunque
-  const b=$('inizia');b.disabled=true;b.textContent='Carico la voce…';
-  await Promise.race([precaricaVoce(),attesa(4000)]);
-  b.disabled=false;render();
- }
- inizia();
-}
-function inizia(){
- const r=RITMI[S.ritmo],pi=piano(S.durata,r);
- Object.assign(P,{r,cicli:pi.cicli,totale:pi.totale,el:-PREP,acc:-PREP,elPrec:-PREP,uiKey:'',toneCiclo:-1});
- VOICE.fine=0;VOICE.partite=[];VOICE.saltate=0;
- $('cicloTot').textContent=pi.cicli;
- disegnaBinario(r);mostra('sessione');P.stato='attiva';wakeOn();
- scriviFase(TESTI.intro);
- if(S.voce)parlaGuida('intro',0);
- avvia();
- $('pausa').focus();
- controllaAudio(true);clearInterval(P.ctrl);P.ctrl=setInterval(()=>controllaAudio(),1000);
-}
-function avvia(){
- P.stato='attiva';P.t0=performance.now();P.uiKey='';P.toneCiclo=-1;P.elPrec=P.acc;
- $('pausa').textContent='Pausa';
- if(passo(P.acc))P.raf=requestAnimationFrame(tick);
-}
-function tick(now){
- if(P.stato!=='attiva')return;
- if(passo(P.acc+Math.max(0,now-P.t0)/1000))P.raf=requestAnimationFrame(tick);
-}
-function passo(el){ // porta tutto al tempo el; false se la sessione è finita
- const prec=P.elPrec;P.el=el;P.elPrec=el;
- if(el>=P.totale){finisci();return false;}
- const r=P.r,f=faseA(el,r),fu=f.fase==='prep'?'prep':faseUI(f.tc,r),k=f.ciclo+'-'+fu;
- if(k!==P.uiKey){
-  P.uiKey=k;scriviFase(fu==='prep'?TESTI.intro:TESTI[fu]);
-  $('ciclo').textContent=Math.min(f.ciclo+1,P.cicli);
-  $('binario').querySelectorAll('text').forEach(t=>t.classList.toggle('on',t.dataset.f===fu));
- }
- if(el>=0&&el>prec)eventi(prec,el);
- if(S.suono&&f.fase!=='prep'&&P.toneCiclo!==f.ciclo){P.toneCiclo=f.ciclo;tonoCiclo(f.tc);}
- disegna(f,el);
- return true;
-}
-// voce, click e vibrazione scattano UNA volta quando il tempo attraversa il loro istante
-function eventi(a,b){
- const r=P.r,L=durCiclo(r),cue=cueCiclo(r);
- for(let c=Math.max(0,Math.floor(a/L));c<=Math.floor(b/L);c++)
-  for(const q of cue){const T=c*L+q.t;if(T>a&&T<=b&&T<P.totale)evento(q.k,c);}
-}
-function evento(k,c){
- if(k==='sorso'){if(S.suono)click();vibra();}
- if(S.voce&&c<VOCE_CICLI)parlaGuida(k,c);
-}
-let _resto='';
-function disegna(f,el){
- const r=P.r,prep=f.fase==='prep',tc=prep?0:f.tc,g=geoCiclo(r);
- const V=prep?0:volumeCiclo(tc,r),q=prep?0:flussoCiclo(tc,r);
- const sorso=!prep&&tc>g.t2&&tc<g.top?Math.sin(Math.PI*(tc-g.t2)/g.D):0;
- aggiornaAnfora($('anfora'),{V,q,t:el,sorso});
- if(P.binX){const pt=$('binPunto'),cl=$('binClip'),x=P.binX(tc);
-  if(pt){pt.setAttribute('cx',f1(x));pt.setAttribute('cy',f1(P.binY(V)));pt.style.display=ridotto()?'none':'';}
-  if(cl)cl.setAttribute('width',ridotto()||prep?'0':f1(x));}
- const rs=mmss(Math.ceil(P.totale-Math.max(0,el)-1e-6));if(rs!==_resto){_resto=rs;$('resto').textContent=rs;}
- $('avanz').style.width=clamp(el/P.totale,0,1)*100+'%';
-}
-function pausa(){
- if(P.stato!=='attiva')return;P.stato='pausa';cancelAnimationFrame(P.raf);P.acc=P.el;
- silenzia();wakeOff();scriviFase(TESTI.pausa);$('pausa').textContent='Riprendi';
-}
-function riprendi(){
- if(P.stato!=='pausa')return;sblocca();P.stato='attiva';wakeOn();avvia();
-}
-function chiudiSessione(){cancelAnimationFrame(P.raf);clearInterval(P.ctrl);silenzia();wakeOff();P.stato='fine';}
-function finisci(){const sec=P.totale,cicli=P.cicli;chiudiSessione();concludi(sec,cicli);}
-function ferma(){
- if(P.stato!=='attiva'&&P.stato!=='pausa')return;
- const el=Math.max(0,P.stato==='attiva'?P.el:P.acc);
- chiudiSessione();concludi(el,Math.floor(el/durCiclo(P.r)+1e-9));
-}
-function concludi(sec,cicli){
- const salvato=sec>=MIN_SEC_DIARIO;
- if(salvato){const d=oggi(),v=S.log[d]||{sec:0,cicli:0,n:0};
-  S.log[d]={sec:Math.round((v.sec||0)+sec),cicli:(v.cicli||0)+cicli,n:(v.n||0)+1};salva();}
- $('fineTitolo').textContent='Hai fatto '+cicli+(cicli===1?' ciclo':' cicli');
- $('fineNota').hidden=salvato;$('fineNota').textContent=salvato?'':'Meno di un minuto: non segnato nel diario.';
- const st=statistiche(),v=S.log[oggi()];
- $('riepilogo').textContent='Oggi '+(v?Math.max(1,Math.round(v.sec/60)):0)+' min · serie di '+st.serie+(st.serie===1?' giorno':' giorni');
- aggiornaAnfora($('anforaFine'),{V:0,fermo:true});
- mostra('fine');$('fineTitolo').focus();
- // tre secondi di silenzio guidato; la frase finale arriva dopo, insieme a «Bene così»
- const punti=[...$('silenzio').querySelectorAll('.punto')];$('silenzio').hidden=false;$('dopo').hidden=true;
- punti.forEach((p,i)=>p.classList.toggle('on',i===0));P.silT.forEach(clearTimeout);
- P.silT=[1,2].map(i=>setTimeout(()=>punti[i].classList.add('on'),i*1000));
- P.silT.push(setTimeout(()=>{$('silenzio').hidden=true;$('dopo').hidden=false;$('torna').focus();
-  if(S.voce)parlaGuida('fine',1);},SILENZIO_MS));
-}
-function tornaIntro(){P.silT.forEach(clearTimeout);P.silT=[];zitto();P.stato='ferma';mostra('intro');render();$('inizia').focus();}
-
-/* ─────────────── diario ─────────────── */
-function statistiche(){
- const giorni=Object.keys(S.log).filter(k=>S.log[k]&&S.log[k].sec>0);
- const sec=giorni.reduce((a,k)=>a+S.log[k].sec,0);
- let off=S.log[oggi()]?0:-1,serie=0;while(S.log[iso(giorno(off))]){serie++;off--;}
- return {giorni:giorni.length,minuti:Math.round(sec/60),serie};
-}
-const dataBreve=d=>{try{return d.toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short'});}catch(e){return iso(d);}};
-const iniziale=d=>'DLMMGVS'[d.getDay()];
-function diario(){
- const st=statistiche();$('stGiorni').textContent=st.giorni;$('stSerie').textContent=st.serie;
- $('stSerieU').textContent=st.serie===1?'giorno di fila':'giorni di fila';$('stMinuti').textContent=st.minuti;
- let html='',fatti=0;for(let j=0;j<7;j++)html+=`<span class="wd" aria-hidden="true">${iniziale(giorno(-27+j))}</span>`;
- for(let i=27;i>=0;i--){const d=giorno(-i),v=S.log[iso(d)];if(v)fatti++;
-  html+=`<span class="g${v?' on':''}${i===0?' oggi':''}" aria-hidden="true" title="${dataBreve(d)}${v?' · '+Math.max(1,Math.round(v.sec/60))+' min':''}">${d.getDate()}</span>`;}
- $('cal').innerHTML=html;$('cal').setAttribute('aria-label',`Ultimi 28 giorni: ${fatti} con pratica`);
-}
-
-/* ─────────────── schermata iniziale ─────────────── */
+/* scelte */
+function seg(id,obj,key,lab){$(id).innerHTML=Object.keys(obj).map(k=>`<button data-k="${k}">${lab(k)}</button>`).join('');
+ $(id).onclick=e=>{const b=e.target.closest('button');if(!b)return;S[key]=isNaN(b.dataset.k)?b.dataset.k:+b.dataset.k;lsSet('marea:pref',S);render();if(key==='guida')carica();}}
+seg('durate',Object.fromEntries(DURATE.map(d=>[d,d])),'durata',k=>k+' min');
+seg('ritmi',RITMI,'ritmo',k=>{const r=RITMI[k];return `${r.n}<small>${r.naso}+${r.sorso}+${r.bocca} s</small>`});
+seg('guide',GUIDE,'guida',k=>GUIDE[k]);
+function serie(){let o=LOG[dIso(0)]?0:-1,n=0;while(LOG[dIso(o)]){n++;o--}return n}
 function render(){
- document.querySelectorAll('[data-durata]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.durata===S.durata)));
- document.querySelectorAll('[data-ritmo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.ritmo===S.ritmo)));
- document.querySelectorAll('[data-voce]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.voce===S.voceScelta)));
- document.querySelectorAll('[data-t]').forEach(b=>b.setAttribute('aria-checked',String(S[b.dataset.t])));
- const r=RITMI[S.ritmo],pi=piano(S.durata,r);
- $('pianoTesto').textContent=`Inspira ${num(r.in)} s, sorso ${num(r.sorso)} s, espira ${num(r.out)} s. ${pi.cicli} cicli da ${num(durCiclo(r))} s: ${mmss(Math.ceil(pi.totale))}.`;
- const udibile=S.suono||S.voce;
- $('volume').value=Math.round(S.volume*100);$('volume').disabled=!udibile;$('volRiga').classList.toggle('spento',!udibile);
- $('volOut').textContent=Math.round(S.volume*100)+'%';
- $('voceSceltaRiga').hidden=!S.voce;$('voceRiga').hidden=!S.voce;
- aggiornaStatoVoce();
- if(!('vibrate'in navigator))$('vibraNota').textContent='Un tocco al secondo sorso (questo browser non la supporta)';
- if(!$('inizia').disabled)$('inizia').textContent='Inizia · '+S.durata+' min';
- const h=new Date().getHours();$('seraAvviso').hidden=!(S.sera&&(h>=19||h<3)&&!S.log[oggi()]);diario();
+ document.querySelectorAll('[data-k]').forEach(b=>{const p=b.parentNode.id,v=p==='durate'?S.durata:p==='ritmi'?S.ritmo:S.guida;b.setAttribute('aria-pressed',String(b.dataset.k==String(v)))});
+ const n=serie();$('serie').textContent=n;$('serieTxt').textContent=n===1?'giorno di fila':'giorni di fila';
+ let h='';for(let i=6;i>=0;i--)h+=`<i class="${LOG[dIso(-i)]?'on':''}"></i>`;$('punti').innerHTML=h;
+ $('vai').textContent='Inizia · '+S.durata+' min';
 }
 
-document.querySelectorAll('[data-durata]').forEach(b=>b.addEventListener('click',()=>{S.durata=+b.dataset.durata;salva();render();}));
-document.querySelectorAll('[data-ritmo]').forEach(b=>b.addEventListener('click',()=>{S.ritmo=b.dataset.ritmo;salva();render();}));
-document.querySelectorAll('[data-voce]').forEach(b=>b.addEventListener('click',()=>{S.voceScelta=b.dataset.voce;salva();render();if(S.voce)precaricaVoce();}));
-document.querySelectorAll('[data-t]').forEach(b=>b.addEventListener('click',()=>{
- const k=b.dataset.t;S[k]=!S[k];salva();render();
- if(k==='suono'&&S.suono){sblocca();tonoBreve(196,293.66);}   // assaggio morbido del volume
- if(k==='voce'&&S.voce)precaricaVoce();
- if(k==='vibra'&&S.vibra)vibra();
-}));
-$('provaVoce').addEventListener('click',async()=>{   // prova udibile, dentro il tocco
- sblocca();
- if(statoVoce()!=='pronta'){await precaricaVoce();}
- parlaGuida('in',0);
-});
-$('volume').addEventListener('input',e=>{impostaVolume(e.target.value/100);salva();$('volOut').textContent=Math.round(S.volume*100)+'%';});
-$('volume').addEventListener('change',()=>{if(S.suono)tonoBreve(293.66,196);});
-$('inizia').addEventListener('click',onInizia);
-$('pausa').addEventListener('click',()=>{if(P.stato==='attiva')pausa();else riprendi();});
-$('stop').addEventListener('click',ferma);
-$('torna').addEventListener('click',tornaIntro);
-$('chip').addEventListener('click',()=>{sblocca();if(S.voce&&statoVoce()!=='pronta')precaricaVoce();setTimeout(()=>controllaAudio(),300);});
-$('azzera').addEventListener('click',()=>{if(confirm('Cancellare tutto il diario da questo browser?')){S.log={};salva();render();}});
-document.addEventListener('keydown',e=>{
- if($('sessione').hidden)return;
- if(e.key==='Escape')ferma();else if(e.key===' '&&e.target===document.body){e.preventDefault();P.stato==='attiva'?pausa():riprendi();}
-});
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&P.stato==='attiva')pausa();});
-window.addEventListener('pagehide',()=>{if(P.stato==='attiva')pausa();});
+/* audio: voci MP3 del repo (solo primi 3 cicli) + tono morbido */
+let AC=null;const BUF={};
+function ac(){if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(C)AC=new C()}if(AC&&AC.state!=='running')AC.resume().catch(()=>{});return AC}
+async function carica(){if(S.guida==='muta')return;const a=ac();if(!a)return;
+ for(const f of['intro','in','sorso','out','fine']){const k=S.guida+'-'+f;if(BUF[k])continue;
+  try{const r=await fetch(AUDIO+k+'.mp3');BUF[k]=await a.decodeAudioData(await r.arrayBuffer())}catch(e){}}}
+function voce(f){if(S.guida==='muta'||!AC)return;const b=BUF[S.guida+'-'+f];if(!b)return;const s=AC.createBufferSource();s.buffer=b;s.connect(AC.destination);s.start()}
+function tono(f0,f1,dur){if(!AC)return;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type='sine';
+ o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+dur);g.gain.setValueAtTime(1e-4,t);
+ g.gain.exponentialRampToValueAtTime(.07,t+Math.min(.4,dur/3));g.gain.exponentialRampToValueAtTime(1e-4,t+dur);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+dur+.05)}
 
-/* anfore statiche: emblema, tre passi, fine */
-$('emblema').innerHTML=anforaSVG('emb',{aria:false});   // il livello lo muove l'animazione CSS
-document.querySelectorAll('.passoAnfora').forEach((s,i)=>{s.innerHTML=anforaSVG('pa'+i,{alone:false,aria:!!s.dataset.aria});
- aggiornaAnfora(s,{V:+s.dataset.v,q:s.dataset.aria?-.4:0,t:1.2,fermo:!s.dataset.aria});});
-$('anfora').innerHTML=anforaSVG('ses');
-$('anforaFine').innerHTML=anforaSVG('fin',{aria:false});
-aggiornaAnfora($('anfora'),{V:0});
+/* respiro: livello 0..1, fasi */
+function fase(tc,r){
+ const a=r.naso,b=a+r.pausa,c=b+r.sorso;const ease=x=>x*x*(3-2*x);
+ if(tc<a)return{f:'naso',p:tc/a,v:.75*ease(tc/a)};
+ if(tc<b)return{f:'pausa',p:(tc-a)/r.pausa,v:.75};
+ if(tc<c)return{f:'sorso',p:(tc-b)/r.sorso,v:.75+.25*ease((tc-b)/r.sorso)};
+ const p=(tc-c)/r.bocca;return{f:'bocca',p,v:1-ease(p)};
+}
 
-render();
-if(S.voce)precaricaVoce();   // i file arrivano mentre leggi: quando premi Inizia sono già pronti
+/* il mare: sfondo a tutto schermo */
+const cv=$('mare'),cx=cv.getContext('2d');let W,H,DPR;
+function size(){DPR=Math.min(2,devicePixelRatio||1);W=cv.width=innerWidth*DPR;H=cv.height=innerHeight*DPR}
+addEventListener('resize',size);size();
+const COL={naso:[43,75,255],pausa:[43,75,255],sorso:[255,90,46],bocca:[0,135,106]};
+let colNow=[43,75,255],livello=.08,mosso=0,fasePh=0;
+function mare(v,f,dt,energia){
+ const tgt=COL[f]||COL.naso;colNow=colNow.map((c,i)=>c+(tgt[i]-c)*Math.min(1,dt*1.5));
+ livello=v;const rid=ridotto.matches;mosso+=(energia-mosso)*Math.min(1,dt*3);if(!rid)fasePh+=dt*(0.4+mosso*1.6);
+ cx.clearRect(0,0,W,H);
+ const base=H*(.92-.72*livello),c=colNow.map(Math.round);
+ for(let k=0;k<4;k++){const amp=(rid?0:(6+18*mosso)*DPR)*(1-k*.2),y0=base+k*H*.035;
+  cx.beginPath();cx.moveTo(0,H);
+  for(let x=0;x<=W;x+=8*DPR){const y=y0+Math.sin(x/W*Math.PI*(2+k)+fasePh*(1+k*.3))*amp+Math.sin(x/W*9+fasePh*1.7)*amp*.3;cx.lineTo(x,y)}
+  cx.lineTo(W,H);cx.closePath();cx.fillStyle=`rgba(${c[0]},${c[1]},${c[2]},${.16+k*.08})`;cx.fill();
+  if(k===0){cx.strokeStyle='rgba(22,22,42,.85)';cx.lineWidth=2*DPR;cx.stroke()}}
+ // linee di marea (scala)
+ cx.strokeStyle='rgba(22,22,42,.08)';cx.lineWidth=1*DPR;
+ for(let i=1;i<10;i++){const y=H*(.92-.72*i/9);cx.beginPath();cx.moveTo(0,y);cx.lineTo(W,y);cx.stroke()}
+}
 
-/* hook minimi per i test automatici (nessun effetto sull'uso normale) */
-try{window.__CICLO_TEST={RITMI,SCALA,durCiclo,piano,faseA,faseUI,cueCiclo,geoCiclo,volumeCiclo,flussoCiclo,scalaCiclo,
- livelloCiclo,livelloDaVolume,curveTono,interp,TESTI,P,AU,VOICE,PREP,SORSO_ANTICIPO,DUCK,passo,pausa,riprendi,ferma,
- tornaIntro,statistiche,statoVoce,controllaAudio,analizza};}catch(e){}
+/* sessione */
+const P={on:false,pausa:false,t:0,last:0,tot:0,L:0,r:null,fk:'',raf:0};
+function mostra(n){['intro','sess','fine'].forEach(x=>$(x).hidden=x!==n)}
+function inizia(){
+ ac();carica();const r=RITMI[S.ritmo];P.r=r;P.L=r.naso+r.pausa+r.sorso+r.bocca;
+ P.tot=Math.max(1,Math.round(S.durata*60/P.L))*P.L;P.t=-3;P.on=true;P.pausa=false;P.fk='';P.last=performance.now();
+ mostra('sess');voce('intro');$('pausa').textContent='Pausa';$('pausa').focus();P.raf=requestAnimationFrame(loop);
+}
+function loop(now){
+ const dt=Math.min(.1,(now-P.last)/1000);P.last=now;
+ if(P.on&&!P.pausa)P.t+=dt;
+ if(P.t>=P.tot)return chiudi(P.tot);
+ let v=.08,f='naso',e=.15;
+ if(P.t<0){$('parola').textContent='Pronto';$('sotto').textContent='mettiti comodo';}
+ else{const c=Math.floor(P.t/P.L),x=fase(P.t-c*P.L,P.r);v=x.v;f=x.f;
+  e=f==='pausa'?0:f==='sorso'?1:f==='naso'?.6:.4*(1-x.p)+.1;
+  const k=c+f;if(k!==P.fk){P.fk=k;$('parola').textContent=TXT[f][0];$('sotto').textContent=TXT[f][1];$('sess').dataset.f=f;
+   $('parola').style.color='rgb('+COL[f].join(',')+')';$('nCiclo').textContent=c+1;
+   if(f==='naso'){tono(196,247,P.r.naso);if(c<3)voce('in')}
+   if(f==='sorso'){tono(247,294,P.r.sorso+.2);if(c<3)voce('sorso');if(navigator.vibrate)try{navigator.vibrate(30)}catch(_){}}
+   if(f==='bocca'){tono(294,147,P.r.bocca);if(c<3)voce('out')}}}
+ if(P.pausa){$('parola').textContent='Pausa';$('sotto').textContent='tocca Riprendi';e=0}
+ $('resto').textContent=mmss(Math.ceil(P.tot-Math.max(0,P.t)));$('avanz').style.width=Math.max(0,P.t/P.tot*100)+'%';
+ mare(v,f,dt,e);P.raf=requestAnimationFrame(loop);
+}
+function chiudi(sec){
+ cancelAnimationFrame(P.raf);P.on=false;const cicli=Math.floor(Math.max(0,sec)/P.L);
+ if(sec>=60){const d=dIso(0),o=LOG[d]||{sec:0};LOG[d]={sec:o.sec+Math.round(sec)};lsSet('marea:log',LOG)}
+ $('fT').textContent=cicli+(cicli===1?' sospiro':' sospiri');
+ $('fS').textContent=sec>=60?'Resta un momento in silenzio. Serie: '+serie()+(serie()===1?' giorno':' giorni')+'.':'Meno di un minuto: non conta nel diario.';
+ mostra('fine');$('fT').focus();voce('fine');mare(.05,'bocca',1,0);
+}
+$('vai').onclick=inizia;
+$('pausa').onclick=()=>{P.pausa=!P.pausa;$('pausa').textContent=P.pausa?'Riprendi':'Pausa';if(!P.pausa)ac()};
+$('stop').onclick=()=>chiudi(Math.max(0,P.t));
+$('torna').onclick=()=>{mostra('intro');render();idle()};
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&P.on)P.pausa=true});
+/* in attesa: la marea respira da sola, lenta */
+function idle(){let t0=performance.now(),l=t0;(function f(n){if(P.on)return;const dt=Math.min(.1,(n-l)/1000);l=n;
+ const r=RITMI.dolce,L=8.7,x=fase(((n-t0)/1000)%L,r);mare(.08+x.v*.22,x.f,dt,.3);requestAnimationFrame(f)})(t0)}
+render();idle();
+window.__MAREA={P,fase,RITMI,chiudi,mare};
 </script>
 </body>
 </html>
