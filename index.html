@@ -40,13 +40,16 @@ h1 i{color:var(--sorso)}
 .punti i.on{background:var(--bocca);border-color:var(--bocca)}
 .spazio{flex:1;min-height:1.2rem}
 .vai{width:100%;min-height:3.4rem;border-radius:999px;border:1.5px solid var(--inchiostro);background:var(--sorso);font-weight:700;font-size:1.05rem;box-shadow:3px 3px 0 var(--inchiostro)}
-.nota{font-size:.75rem;color:var(--grigio);margin-top:.8rem;line-height:1.45}
+.nota{position:relative;font-size:.78rem;color:var(--inchiostro);margin-top:.8rem;line-height:1.45;background:rgba(243,238,228,.94);border:1px solid rgba(22,22,42,.25);border-radius:12px;padding:.55rem .7rem}
 /* sessione */
 #sess .alto{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase}
 .parola{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.4rem}
 .parola strong{font-family:var(--serif);font-weight:400;font-size:clamp(4rem,22vw,6.2rem);line-height:1;letter-spacing:-.02em;
- transition:letter-spacing 1.2s ease,color .8s ease}
-.parola span{font-size:1.05rem;color:#3d3c4e;min-height:1.4em}
+ transition:letter-spacing 1.2s ease}
+.parola span{font-size:1.05rem;color:var(--inchiostro);min-height:1.4em;background:rgba(243,238,228,.9);border-radius:999px;padding:.15rem .8rem}
+.parola strong{color:var(--inchiostro);text-shadow:0 0 18px rgba(243,238,228,.9)}
+.parola strong::after{content:'';display:block;height:6px;width:40%;margin:.25rem auto 0;border-radius:6px;background:var(--fc,var(--inchiostro));border:1.5px solid var(--inchiostro)}
+#sess[data-f=naso],#sess[data-f=pausa]{--fc:var(--naso)}#sess[data-f=sorso]{--fc:var(--sorso)}#sess[data-f=bocca]{--fc:var(--bocca)}
 #sess[data-f=out] .parola strong{letter-spacing:.12em;font-style:italic}
 .basso{display:flex;gap:.6rem;justify-content:center}
 .basso button{min-height:2.9rem;min-width:7.5rem;border-radius:999px;border:1.5px solid var(--inchiostro);background:rgba(255,255,255,.7);font-weight:600}
@@ -150,13 +153,13 @@ addEventListener('resize',size);size();
 const COL={naso:[43,75,255],pausa:[43,75,255],sorso:[255,90,46],bocca:[0,135,106]};
 let colNow=[43,75,255],livello=.08,mosso=0,fasePh=0;
 function mare(v,f,dt,energia){
- const tgt=COL[f]||COL.naso;colNow=colNow.map((c,i)=>c+(tgt[i]-c)*Math.min(1,dt*1.5));
+ const tgt=COL[f]||COL.naso;colNow=colNow.map((c,i)=>c+(tgt[i]-c)*Math.min(1,dt*(f==='sorso'?9:5)));
  livello=v;const rid=ridotto.matches;mosso+=(energia-mosso)*Math.min(1,dt*3);if(!rid)fasePh+=dt*(0.4+mosso*1.6);
  cx.clearRect(0,0,W,H);
  const base=H*(.92-.72*livello),c=colNow.map(Math.round);
  for(let k=0;k<4;k++){const amp=(rid?0:(6+18*mosso)*DPR)*(1-k*.2),y0=base+k*H*.035;
   cx.beginPath();cx.moveTo(0,H);
-  for(let x=0;x<=W;x+=8*DPR){const y=y0+Math.sin(x/W*Math.PI*(2+k)+fasePh*(1+k*.3))*amp+Math.sin(x/W*9+fasePh*1.7)*amp*.3;cx.lineTo(x,y)}
+  const st=8*DPR;for(let i=0;i<=Math.ceil(W/st);i++){const x=Math.min(W,i*st),y=y0+Math.sin(x/W*Math.PI*(2+k)+fasePh*(1+k*.3))*amp+Math.sin(x/W*9+fasePh*1.7)*amp*.3;cx.lineTo(x,y)}
   cx.lineTo(W,H);cx.closePath();cx.fillStyle=`rgba(${c[0]},${c[1]},${c[2]},${.16+k*.08})`;cx.fill();
   if(k===0){cx.strokeStyle='rgba(22,22,42,.85)';cx.lineWidth=2*DPR;cx.stroke()}}
  // linee di marea (scala)
@@ -181,7 +184,7 @@ function loop(now){
  else{const c=Math.floor(P.t/P.L),x=fase(P.t-c*P.L,P.r);v=x.v;f=x.f;
   e=f==='pausa'?0:f==='sorso'?1:f==='naso'?.6:.4*(1-x.p)+.1;
   const k=c+f;if(k!==P.fk){P.fk=k;$('parola').textContent=TXT[f][0];$('sotto').textContent=TXT[f][1];$('sess').dataset.f=f;
-   $('parola').style.color='rgb('+COL[f].join(',')+')';$('nCiclo').textContent=c+1;
+   $('nCiclo').textContent=c+1;
    if(f==='naso'){tono(196,247,P.r.naso);if(c<3)voce('in')}
    if(f==='sorso'){tono(247,294,P.r.sorso+.2);if(c<3)voce('sorso');if(navigator.vibrate)try{navigator.vibrate(30)}catch(_){}}
    if(f==='bocca'){tono(294,147,P.r.bocca);if(c<3)voce('out')}}}
@@ -192,7 +195,7 @@ function loop(now){
 function chiudi(sec){
  cancelAnimationFrame(P.raf);P.on=false;const cicli=Math.floor(Math.max(0,sec)/P.L);
  if(sec>=60){const d=dIso(0),o=LOG[d]||{sec:0};LOG[d]={sec:o.sec+Math.round(sec)};lsSet('marea:log',LOG)}
- $('fT').textContent=cicli+(cicli===1?' sospiro':' sospiri');
+ $('fT').textContent='Hai fatto '+cicli+(cicli===1?' sospiro':' sospiri');
  $('fS').textContent=sec>=60?'Resta un momento in silenzio. Serie: '+serie()+(serie()===1?' giorno':' giorni')+'.':'Meno di un minuto: non conta nel diario.';
  mostra('fine');$('fT').focus();voce('fine');mare(.05,'bocca',1,0);
 }
