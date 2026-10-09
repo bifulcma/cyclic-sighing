@@ -48,12 +48,14 @@ h1 i{color:var(--sorsoT)}
 .parola{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.4rem}
 .parola strong{font-family:var(--serif);font-weight:400;font-size:clamp(4rem,22vw,6.2rem);line-height:1;letter-spacing:-.02em;
  transition:letter-spacing 1.2s ease}
-.parola span:empty{visibility:hidden}
+.parola span.vuoto{opacity:0}
 .parola span{font-size:1.05rem;color:var(--inchiostro);min-height:1.4em;background:rgba(243,238,228,.9);border-radius:14px;padding:.15rem .8rem}
 .parola strong{color:var(--inchiostro);text-shadow:0 0 18px rgba(243,238,228,.9)}
 #sess .parola strong::after{content:'';display:block;height:6px;width:40%;margin:.25rem auto 0;border-radius:6px;background:var(--fc,var(--inchiostro));border:1.5px solid var(--inchiostro)}
 #sess[data-f=naso],#sess[data-f=pausa]{--fc:var(--naso)}#sess[data-f=sorso],#sess[data-f=pausa2]{--fc:var(--sorso)}#sess[data-f=bocca],#sess[data-f=pausa3]{--fc:var(--bocca)}
-#sess[data-f=bocca] .parola strong{letter-spacing:.12em;font-style:italic}
+/* la parola non cambia stile fra le fasi (prima il corsivo/spaziatura di «Bocca» saltava nella pausa a vuoto): cambia solo il testo, in dissolvenza */
+.parola strong,.parola span{transition:opacity .12s ease}
+#sess .parola strong::after{transition:background-color .4s ease}
 .basso{display:flex;gap:.6rem;justify-content:center}
 .basso button{min-height:2.9rem;min-width:7.5rem;border-radius:999px;border:1.5px solid var(--inchiostro);background:rgba(255,255,255,.7);font-weight:600}
 .basso .stop{color:#B3122F;border-color:#B3122F}
@@ -122,7 +124,7 @@ const RITMI={dolce:{n:'Dolce',naso:2,p1:.25,sorso:.8,p2:.25,bocca:5.6,p3:.8},sta
 const DURATE=[2,5,10];
 const PREP=4; // la frase iniziale (2,8 s) finisce prima del primo «Inspira»
 const GUIDE={aurora:'Voce guida',muta:'Silenzio'};
-const TXT={naso:['Naso','inspira'],pausa:['Naso',''],pausa2:['Ancora',''],pausa3:['Bocca','vuoto, riposa'],sorso:['Ancora','ancora un po’, dal naso'],bocca:['Bocca','lascia andare, piano']};
+const TXT={naso:['Naso','inspira'],pausa:['Naso',''],pausa2:['Ancora',''],pausa3:['Bocca','lascia andare, piano'],sorso:['Ancora','ancora un po’, dal naso'],bocca:['Bocca','lascia andare, piano']};
 const ls=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const MEDSEL={si:'Sì',no:'No'};
@@ -201,7 +203,12 @@ const P={on:false,pausa:false,t:0,last:0,tot:0,L:0,r:null,fk:'',raf:0,t0:0,fermo
 async function wakeOn(){try{if('wakeLock'in navigator&&!P.wake&&P.on&&!document.hidden){P.wake=await navigator.wakeLock.request('screen');P.wake.addEventListener('release',()=>{P.wake=null})}}catch(e){}}
 function wakeOff(){try{P.wake&&P.wake.release()}catch(e){}P.wake=null}
 function annuncia(s){$('annuncio').textContent=s}
-function metti(a,b){if($('parola').textContent!==a)$('parola').textContent=a;if($('sotto').textContent!==b)$('sotto').textContent=b}
+// cambio di testo in dissolvenza (0,12 s fuori, 0,12 s dentro): niente scatti fra le fasi
+const _dis={};
+function dissolvi(id,x){const e=$(id);if((_dis[id]??e.textContent)===x)return;_dis[id]=x;
+ if(ridotto.matches||!e.textContent){e.textContent=x;e.classList.toggle('vuoto',!x);e.style.opacity='';return}
+ e.style.opacity='0';clearTimeout(e._t);e._t=setTimeout(()=>{e.textContent=x;e.classList.toggle('vuoto',!x);e.style.opacity='';},120)}
+function metti(a,b){dissolvi('parola',a);dissolvi('sotto',b)}
 function mostra(n){['intro','med','sess','fine'].forEach(x=>$(x).hidden=x!==n)}
 function inizia(){
  ac();carica();const r=RITMI[S.ritmo];P.r=r;P.L=durL(r);
