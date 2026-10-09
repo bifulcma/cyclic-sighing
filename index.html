@@ -241,6 +241,35 @@
     .fase{font-size:1.05rem;min-height:2.3em}
   }
 </style>
+<style>
+  /* Pensiero della notte: stessa grafica HUD, luce più bassa per la sera a letto */
+  .pens-nav{min-height:2.75rem;padding:.5rem 0;font-family:var(--mono);font-size:.75rem;letter-spacing:.16em;
+            text-transform:uppercase;color:var(--muted)}
+  .pens-nav.salta{color:var(--ionDim)}
+  .pens{justify-content:flex-start;overflow-y:auto;padding-top:.5rem;padding-bottom:.75rem;-webkit-overflow-scrolling:touch}
+  .pens-corpo{width:100%;max-width:24rem;margin:auto 0;text-align:left}
+  .pens-testa{display:flex;justify-content:space-between;align-items:baseline;gap:1rem}
+  .pens-num{font-family:var(--mono);font-size:.6875rem;letter-spacing:.12em;color:var(--muted);font-variant-numeric:tabular-nums}
+  .pens-card{margin-top:.9rem;padding:1.5rem 1.25rem 1.25rem}
+  .pens-testo{font-size:1.1875rem;line-height:1.62;color:rgba(238,242,247,.82);letter-spacing:.005em}
+  .pens-testo .verso{display:block;padding-left:1.2em;text-indent:-1.2em}
+  .pens-fonte{margin-top:1rem;font-family:var(--mono);font-size:.75rem;line-height:1.5;letter-spacing:.03em;color:var(--muted)}
+  .pens-fonte b{font-weight:500;color:rgba(238,242,247,.68)}
+  .pens-consegna{margin-top:1.5rem;padding-left:1rem;border-left:1px solid rgba(169,155,255,.45)}
+  .pens-consegna .etichetta{margin:0 0 .35rem}
+  #pensNotte{font-size:1.0625rem;line-height:1.5;color:var(--plasma2);opacity:.9}
+  .primario.tenue{background:rgba(214,255,75,.08);color:var(--ion);box-shadow:none}
+  .pens-comandi .primario{margin-top:0;max-width:24rem}
+  .entra{animation:entra 1.4s ease-out both}
+  .entra.d2{animation-delay:.8s}
+  @keyframes entra{from{opacity:0;transform:translateY(.4rem)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.entra{animation:none!important}}
+  @media (max-height:700px){
+    .pens-testo{font-size:1.0625rem}
+    .pens-card{padding:1.15rem 1rem 1rem}
+    .pens-consegna{margin-top:1rem}
+  }
+</style>
 </head>
 <body>
 
@@ -398,6 +427,29 @@
   </footer>
 </main>
 
+<div id="pensiero" class="schermo notte" role="dialog" aria-modal="true" aria-labelledby="pensEtichetta" aria-describedby="pensTesto" hidden>
+  <div class="barra">
+    <button id="pensIndietro" class="pens-nav">‹ Indietro</button>
+    <button id="pensSalta" class="pens-nav salta" aria-label="Salta il pensiero e inizia a respirare">Salta ›</button>
+  </div>
+  <div class="centro pens">
+    <div class="pens-corpo">
+      <div class="pens-testa"><p class="eyebrow" id="pensEtichetta">Pensiero della notte</p><p id="pensNum" class="pens-num"></p></div>
+      <figure class="card pens-card entra">
+        <blockquote id="pensTesto" class="pens-testo"></blockquote>
+        <figcaption id="pensFonte" class="pens-fonte"></figcaption>
+      </figure>
+      <div class="pens-consegna entra d2">
+        <p class="etichetta">Per la notte</p>
+        <p id="pensNotte"></p>
+      </div>
+    </div>
+  </div>
+  <div class="comandi pens-comandi">
+    <button id="respira" class="primario tenue">Respira</button>
+  </div>
+</div>
+
 <div id="sessione" class="schermo" role="dialog" aria-modal="true" aria-label="Sessione di respirazione" hidden>
   <div class="barra">
     <span class="eyebrow">Ciclo <b id="ciclo">1</b> / <b id="cicloTot">0</b></span>
@@ -439,6 +491,245 @@
 
 <script>
 'use strict';
+/* ─────────────── PENSIERI: inizio ─────────────── */
+// Pensiero della notte: uno al giorno, prima del respiro. Per aggiungerne uno basta una riga nuova
+// (e la sua riga in docs/FONTI.md). Campi:
+//  id      unico, mai riusato
+//  autore  come appare a schermo
+//  fonte   opera e riferimento preciso
+//  tipo    'citazione' = testo fedele (tradotto) con riferimento verificato
+//          'parafrasi' = ispirato all'autore, parole nostre: a schermo «da Autore, parafrasi»
+//  testo   1-3 frasi; \n va a capo (versi)
+//  notte   la consegna per la notte: una parola da portare nel sonno o una domanda breve
+//  audio   (facoltativo, non ancora usato) file della voce che legge il pensiero, in AUDIO_BASE
+const PENSIERI=[
+ {id:'benedetto-pace',autore:'Benedetto da Norcia',fonte:'Regola, 4,73-74',tipo:'citazione',
+  testo:'Con chi è in discordia, fare pace prima del tramonto del sole. E non disperare mai della misericordia di Dio.',
+  notte:'C’è qualcuno con cui fare pace, almeno nel cuore, prima di dormire?'},
+ {id:'seneca-sonno',autore:'Seneca',fonte:'L’ira (De ira) III,36,2',tipo:'citazione',
+  testo:'Che sonno segue a questo esame di sé: quanto tranquillo, quanto profondo e libero, quando l’animo è stato lodato o ammonito!',
+  notte:'Ripassa la giornata da amico, non da giudice. Poi dormi.'},
+ {id:'ignazio-gustare',autore:'Ignazio di Loyola',fonte:'Esercizi spirituali, n. 2',tipo:'citazione',
+  testo:'Non il molto sapere sazia e soddisfa l’anima, ma il sentire e gustare le cose interiormente.',
+  notte:'Stanotte non ragionare: gusta una sola cosa buona di oggi.'},
+ {id:'teresa-lisieux-dormire',autore:'Teresa di Lisieux',fonte:'Manoscritto A, 75v',tipo:'citazione',
+  testo:'Dovrei rattristarmi di dormire (da sette anni) durante le mie orazioni… ebbene, non mi rattristo… Penso che i bambini piccoli piacciano ai loro genitori tanto quando dormono quanto quando sono svegli.',
+  notte:'Se ti addormenti mentre respiri o preghi, va bene così.'},
+ {id:'rumi-gabbia',autore:'Rumi',fonte:'Masnavi I,388-390, dalla traduzione di R.A. Nicholson',tipo:'citazione',
+  testo:'Ogni notte tu liberi gli spiriti dal laccio del corpo e cancelli le tavolette della mente. Ogni notte gli spiriti escono liberi da questa gabbia… Di notte i prigionieri non sanno della loro prigione, di notte i potenti non sanno del loro potere.',
+  notte:'Stanotte lascia la gabbia: nel sonno nessuno è prigioniero.'},
+ {id:'salmo-4-9',autore:'Bibbia',fonte:'Salmo 4,9',tipo:'citazione',
+  testo:'In pace mi corico e subito mi addormento, perché tu solo, Signore, fiducioso mi fai riposare.',
+  notte:'Porta nel sonno una parola sola: «pace».'},
+ {id:'agostino-inquieto',autore:'Agostino d’Ippona',fonte:'Confessioni I,1,1',tipo:'citazione',
+  testo:'Ci hai fatti per te, e il nostro cuore è inquieto finché non riposa in te.',
+  notte:'Porta nel sonno una parola sola: «riposa».'},
+ {id:'marco-aurelio-ritiro',autore:'Marco Aurelio',fonte:'Ricordi IV,3',tipo:'citazione',
+  testo:'In nessun luogo l’uomo si ritira con più quiete e meno affanni che nella propria anima… Concediti dunque di continuo questo ritiro, e rinnova te stesso.',
+  notte:'Chiudi gli occhi e ritirati dentro: è il luogo più quieto che hai.'},
+ {id:'ignazio-esame',autore:'Ignazio di Loyola',fonte:'Esercizi spirituali, n. 43 (Esame generale)',tipo:'citazione',
+  testo:'Il primo punto è rendere grazie a Dio nostro Signore per i benefici ricevuti.',
+  notte:'Prima di dormire: per quale dono di oggi puoi dire grazie?'},
+ {id:'giovanni-croce-notte',autore:'Giovanni della Croce',fonte:'Notte oscura, strofa 1',tipo:'citazione',
+  testo:'In una notte oscura,\ncon ansie, d’amori infiammata,\noh felice ventura!,\nuscii senza esser notata,\nessendo ormai la mia casa quieta.',
+  notte:'Quando la casa è quieta, puoi uscire anche tu dal rumore.'},
+ {id:'ebraica-hashkiveinu',autore:'Preghiera ebraica della sera',fonte:'Hashkiveinu, liturgia serale (Maariv)',tipo:'citazione',
+  testo:'Facci coricare in pace, Signore nostro Dio, e rialzaci alla vita, nostro Re; stendi su di noi la tenda della tua pace.',
+  notte:'Immagina una tenda di pace stesa sopra il tuo letto.'},
+ {id:'salmo-131-2',autore:'Bibbia',fonte:'Salmo 131,2',tipo:'citazione',
+  testo:'Io invece resto quieto e sereno: come un bimbo svezzato in braccio a sua madre, come un bimbo svezzato è in me l’anima mia.',
+  notte:'Lascia che il corpo pesi sul letto, come un bimbo in braccio.'},
+ {id:'newman-luce',autore:'John Henry Newman',fonte:'«Lead, Kindly Light», 16 giugno 1833',tipo:'citazione',
+  testo:'Guidami, Luce gentile, nel buio che mi avvolge,\nguidami tu!\nLa notte è scura e sono lontano da casa:\nguidami tu!\nReggi i miei passi; non chiedo di vedere\nil paesaggio lontano: un passo mi basta.',
+  notte:'Non serve vedere tutto il domani: basta il primo passo.'},
+ {id:'dogen-luna',autore:'Dōgen',fonte:'Shōbōgenzō, «Genjōkōan» (1233)',tipo:'citazione',
+  testo:'Ottenere il risveglio è come la luna che si posa sull’acqua: la luna non si bagna, l’acqua non si rompe… La luna intera e il cielo intero si posano anche nella rugiada sull’erba, anche in una sola goccia d’acqua.',
+  notte:'Anche una goccia contiene tutta la luna: basta un attimo di quiete.'},
+ {id:'teresa-avila-nada',autore:'Teresa d’Avila',fonte:'«Nada te turbe», poesia trovata nel suo breviario',tipo:'citazione',
+  testo:'Nulla ti turbi,\nnulla ti spaventi,\ntutto passa,\nDio non cambia,\nla pazienza\nottiene tutto.\nChi ha Dio\nnulla gli manca.\nSolo Dio basta.',
+  notte:'Porta nel sonno due parole: «tutto passa».'},
+ {id:'ignazio-stelle',autore:'Ignazio di Loyola',fonte:'Racconto del pellegrino (Autobiografia), n. 11',tipo:'citazione',
+  testo:'La consolazione più grande che riceveva era guardare il cielo e le stelle, e lo faceva molte volte e a lungo, perché sentiva in sé un grandissimo slancio a servire nostro Signore.',
+  notte:'Se puoi, guarda il cielo un momento prima di chiudere gli occhi.'},
+ {id:'hillesum-promessa',autore:'Etty Hillesum',fonte:'Diario, 12 luglio 1942',tipo:'citazione',
+  testo:'Ti prometto una cosa, Dio, solo una piccolezza: non appenderò al giorno di oggi, come altrettanti pesi, le mie preoccupazioni per il futuro… Ogni giorno basta a se stesso.',
+  notte:'Lascia le preoccupazioni di domani fuori dalla porta della camera.'},
+ {id:'mose-cella',autore:'Abba Mosè, Padri del deserto',fonte:'Detti dei Padri del deserto, Mosè 6',tipo:'citazione',
+  testo:'Un fratello chiese una parola all’abba Mosè. L’anziano gli disse: “Va’, siediti nella tua cella, e la tua cella ti insegnerà ogni cosa”.',
+  notte:'Stanotte il letto è la tua cella: resta, e ascolta.'},
+ {id:'nunc-dimittis',autore:'Bibbia',fonte:'Luca 2,29-30 (Cantico di Simeone, Compieta)',tipo:'citazione',
+  testo:'Ora puoi lasciare, o Signore, che il tuo servo vada in pace, secondo la tua parola, perché i miei occhi hanno visto la tua salvezza.',
+  notte:'Che cosa hanno visto di buono, oggi, i tuoi occhi?'},
+ {id:'sales-sera',autore:'Francesco di Sales',fonte:'Filotea (Introduzione alla vita devota) II,11',tipo:'citazione',
+  testo:'Si ringrazia Dio di averci custoditi nella giornata trascorsa… Si affidano alla divina Provvidenza il proprio corpo, la propria anima, la Chiesa, i parenti, gli amici… e con la benedizione di Dio si va a prendere il riposo.',
+  notte:'Affida per nome, una per una, le persone che ami.'},
+ {id:'versi-aurei',autore:'Versi aurei (tradizione pitagorica)',fonte:'vv. 40-44',tipo:'citazione',
+  testo:'Non accogliere il sonno sui teneri occhi prima di aver ripassato tre volte ogni azione del giorno: “Dove ho mancato? Che cosa ho fatto? Che cosa dovevo e non ho compiuto?”… Del male rimproverati, del bene rallegrati.',
+  notte:'Per il bene di oggi, rallegrati. Il resto affidalo alla notte.'},
+ {id:'ignazio-consolazione',autore:'Ignazio di Loyola',fonte:'Esercizi spirituali, n. 316',tipo:'citazione',
+  testo:'Chiamo consolazione ogni aumento di speranza, fede e carità e ogni letizia interiore che chiama e attira alle cose celesti, quietando e pacificando l’anima nel suo Creatore e Signore.',
+  notte:'Domanda per la notte: dove, oggi, ho sentito crescere la speranza?'},
+ {id:'foucauld-abbandono',autore:'Charles de Foucauld',fonte:'meditazione su Luca 23,46 (1896)',tipo:'citazione',
+  testo:'Padre mio, mi rimetto nelle tue mani; Padre mio, mi confido in te; Padre mio, mi abbandono a te; Padre mio, fa’ di me ciò che ti piacerà; qualunque cosa tu faccia di me, ti ringrazio.',
+  notte:'Respirando piano, ripeti: «mi abbandono a te».'},
+ {id:'weil-attenzione',autore:'Simone Weil',fonte:'lettera a Joë Bousquet, 13 aprile 1942',tipo:'citazione',
+  testo:'L’attenzione è la forma più rara e più pura della generosità.',
+  notte:'Chi ti ha dato attenzione oggi? Ringrazialo nel cuore.'},
+ {id:'salmo-16-7',autore:'Bibbia',fonte:'Salmo 16,7',tipo:'citazione',
+  testo:'Benedico il Signore che mi ha dato consiglio; anche di notte il mio animo mi istruisce.',
+  notte:'Lascia aperta una domanda: la notte può portare consiglio.'},
+ {id:'giuliana-bene',autore:'Giuliana di Norwich',fonte:'Rivelazioni dell’amore divino, cap. 27',tipo:'citazione',
+  testo:'…tutto sarà bene, e tutto sarà bene, e ogni sorta di cosa sarà bene.',
+  notte:'Porta nel sonno tre parole: «tutto sarà bene».'},
+ {id:'talmud-perdono',autore:'Talmud babilonese',fonte:'Meghillà 28a (Mar Zutra)',tipo:'citazione',
+  testo:'Quando Mar Zutra saliva sul suo letto, diceva: “Perdono chiunque mi abbia fatto soffrire”.',
+  notte:'Ripeti anche tu, se puoi: «perdono chi oggi mi ha fatto soffrire».'},
+ {id:'ignazio-raggi',autore:'Ignazio di Loyola',fonte:'Esercizi spirituali, n. 237',tipo:'citazione',
+  testo:'Guardare come tutti i beni e i doni discendono dall’alto… così come dal sole discendono i raggi, dalla fonte le acque.',
+  notte:'Ripensa a un dono di oggi e risali fino alla sua fonte.'},
+ {id:'giovanni-croce-sera',autore:'Giovanni della Croce',fonte:'Detti di luce e d’amore, n. 59',tipo:'citazione',
+  testo:'Alla sera ti esamineranno sull’amore; impara ad amare come Dio vuole essere amato e lascia il tuo modo di essere.',
+  notte:'Domanda per la notte: dove, oggi, ho amato?'},
+ {id:'rilke-oscurita',autore:'Rainer Maria Rilke',fonte:'Il libro d’ore (1899)',tipo:'citazione',
+  testo:'Tu, oscurità da cui provengo,\nti amo più della fiamma\nche limita il mondo\nrisplendendo per un cerchio qualunque…\nMa l’oscurità tiene tutto con sé:\nforme e fiamme, animali e me…\nCredo nelle notti.',
+  notte:'Il buio non è un nemico: lascia che ti tenga.'},
+ {id:'cassiano-versetto',autore:'Giovanni Cassiano',fonte:'Conferenze X,10,2 e X,10,15',tipo:'citazione',
+  testo:'Sia questa la vostra formula, da non lasciare mai: “O Dio, vieni in mio aiuto; Signore, affrettati ad aiutarmi”… Il sonno ti colga mentre mediti questo versetto, finché ti abitui a ripeterlo anche dormendo.',
+  notte:'Scegli una frase breve e lascia che il sonno ti trovi a ripeterla.'},
+ {id:'compieta-antifona',autore:'Compieta',fonte:'Liturgia delle Ore, antifona al Cantico di Simeone',tipo:'citazione',
+  testo:'Nella veglia salvaci, Signore, nel sonno non ci abbandonare: il cuore vegli con Cristo e il corpo riposi nella pace.',
+  notte:'Il corpo riposa; il cuore può restare sveglio accanto a chi ami.'},
+ {id:'ryokan-luna',autore:'Ryōkan',fonte:'haiku, dopo un furto nel suo eremo',tipo:'citazione',
+  testo:'Il ladro\nl’ha lasciata indietro:\nla luna alla finestra.',
+  notte:'Quello che conta davvero, nessuno te lo può portare via.'},
+ {id:'teilhard-fiducia',autore:'Pierre Teilhard de Chardin',fonte:'lettera alla cugina Marguerite, 4 luglio 1915',tipo:'parafrasi',
+  testo:'Abbi fiducia nel lento lavoro di Dio. Ogni crescita passa per tempi instabili, a volte lunghi. Credi che una mano ti guidi nel buio, e accetta di sentirti ancora incompiuto.',
+  notte:'Non devi essere finito stasera: puoi dormire anche incompiuto.'},
+ {id:'ignazio-suscipe',autore:'Ignazio di Loyola',fonte:'Esercizi spirituali, n. 234 (Suscipe)',tipo:'citazione',
+  testo:'Prendi, Signore, e ricevi tutta la mia libertà, la mia memoria, il mio intelletto e tutta la mia volontà, tutto ciò che ho e possiedo; tu me lo hai dato, a te, Signore, lo rendo; tutto è tuo: disponine secondo la tua volontà; dammi il tuo amore e la tua grazia, che questa mi basta.',
+  notte:'Consegna la giornata così com’è. Porta nel sonno: «mi basta».'},
+ {id:'marco-aurelio-grazie',autore:'Marco Aurelio',fonte:'Ricordi I,17',tipo:'citazione',
+  testo:'Dagli dèi: aver avuto buoni nonni, buoni genitori, una buona sorella, buoni maestri, buoni familiari, parenti, amici, quasi tutti.',
+  notte:'Nomina tre persone che ti hanno fatto del bene. Ringrazia.'},
+ {id:'francesco-luna',autore:'Francesco d’Assisi',fonte:'Cantico di frate Sole (codice di Assisi 338)',tipo:'citazione',
+  testo:'Laudato si’ mi signore per sora luna e le stelle,\nin celu l’ai formate clarite et pretiose et belle.\nLaudato si’ mi signore per frate focu,\nper lo quale ennallumini la nocte,\ned ello è bello et iocundo et robustoso et forte.',
+  notte:'Prima di dormire, saluta la luna o una stella, anche dalla finestra.'},
+ {id:'salmo-121-4',autore:'Bibbia',fonte:'Salmo 121,4',tipo:'citazione',
+  testo:'Non si addormenterà, non prenderà sonno il custode d’Israele.',
+  notte:'Qualcuno veglia: puoi smettere di vegliare tu.'},
+ {id:'agostino-tardi',autore:'Agostino d’Ippona',fonte:'Confessioni X,27,38',tipo:'citazione',
+  testo:'Tardi ti ho amato, bellezza così antica e così nuova, tardi ti ho amato! Ed ecco, tu eri dentro e io fuori, e là ti cercavo… Tu eri con me, e io non ero con te.',
+  notte:'Stasera non cercare fuori: chiudi gli occhi e resta dentro.'},
+ {id:'habiba-stelle',autore:'Ḥabība al-‘Adawiyya, mistica di Bassora',fonte:'riferita da al-Ghazālī, Iḥyā’ ‘ulūm al-dīn',tipo:'citazione',
+  testo:'Mio Dio, sono tramontate le stelle, gli occhi si sono addormentati, i re hanno chiuso le loro porte, ogni amante è rimasto solo con il suo amato, e questo è il mio posto davanti a te.',
+  notte:'Il mondo si è chiuso: ora è il tuo tempo, da solo con chi ami.'},
+ {id:'ignazio-desolazione',autore:'Ignazio di Loyola',fonte:'Esercizi spirituali, n. 318',tipo:'citazione',
+  testo:'In tempo di desolazione non fare mai cambiamenti, ma restare saldi e costanti nei propositi e nella decisione in cui si era il giorno prima di quella desolazione.',
+  notte:'Se stasera è buio dentro, non decidere nulla: domattina vedrai meglio.'},
+ {id:'teresa-lisieux-slancio',autore:'Teresa di Lisieux',fonte:'Manoscritto C, 25r-v',tipo:'citazione',
+  testo:'Per me la preghiera è uno slancio del cuore, un semplice sguardo gettato verso il Cielo, un grido di riconoscenza e di amore nella prova come nella gioia.',
+  notte:'Prima di dormire, un solo sguardo verso l’alto. Basta.'},
+ {id:'ebraica-hamapil',autore:'Preghiera ebraica della sera',fonte:'benedizione HaMapil, Shema prima di dormire',tipo:'citazione',
+  testo:'Benedetto sei tu, Signore nostro Dio, re del mondo, che fai scendere i lacci del sonno sui miei occhi e il sopore sulle mie palpebre… Non mi spaventino i miei pensieri, né sogni cattivi, né cattive fantasie.',
+  notte:'Consegna i tuoi pensieri prima che diventino sogni.'},
+ {id:'arsenio-quiete',autore:'Abba Arsenio, Padri del deserto',fonte:'Detti dei Padri del deserto, Arsenio 2',tipo:'citazione',
+  testo:'E udì una voce che gli diceva: “Arsenio, fuggi, taci, sta’ nella quiete”.',
+  notte:'Tre gesti per la notte: lontano dal rumore, in silenzio, in pace.'},
+ {id:'genesi-sogno',autore:'Bibbia',fonte:'Genesi 28,16 (il sogno di Giacobbe)',tipo:'citazione',
+  testo:'Giacobbe si svegliò dal sonno e disse: “Certo, il Signore è in questo luogo e io non lo sapevo”.',
+  notte:'Domattina, prima di alzarti, ricorda un frammento di sogno.'},
+ {id:'dhammapada-odio',autore:'Dhammapada',fonte:'verso 5',tipo:'citazione',
+  testo:'Mai, in questo mondo, l’odio si placa con l’odio; con il non-odio si placa: questa è una legge antica.',
+  notte:'Se oggi qualcuno ti ha ferito, non portarti il rancore nel sonno.'},
+ {id:'bonhoeffer-potenze',autore:'Dietrich Bonhoeffer',fonte:'«Von guten Mächten», dicembre 1944',tipo:'citazione',
+  testo:'Da potenze buone meravigliosamente custoditi,\nattendiamo fiduciosi ciò che verrà.\nDio è accanto a noi la sera e il mattino\ne di certo in ogni nuovo giorno.',
+  notte:'Affida il domani: qualunque cosa venga, non sarai solo.'},
+ {id:'ignazio-principio',autore:'Ignazio di Loyola',fonte:'Esercizi spirituali, n. 23 (Principio e fondamento)',tipo:'citazione',
+  testo:'L’uomo è creato per lodare, riverire e servire Dio nostro Signore… desiderando e scegliendo soltanto ciò che più ci conduce al fine per cui siamo creati.',
+  notte:'Domanda per la notte: che cosa, oggi, mi ha avvicinato a ciò per cui vivo?'},
+ {id:'rilke-domande',autore:'Rainer Maria Rilke',fonte:'Lettere a un giovane poeta, 16 luglio 1903',tipo:'citazione',
+  testo:'Abbia pazienza verso tutto ciò che nel suo cuore è irrisolto e cerchi di amare le domande stesse, come stanze chiuse e libri scritti in una lingua molto straniera… Viva ora le domande.',
+  notte:'Porta nel sonno una domanda, senza pretendere la risposta.'},
+ {id:'teresa-avila-amicizia',autore:'Teresa d’Avila',fonte:'Vita 8,5',tipo:'citazione',
+  testo:'L’orazione mentale non è altro, a mio parere, che un rapporto d’amicizia: un trattenersi spesso da soli con chi sappiamo che ci ama.',
+  notte:'Prima di dormire, parla a chi ti ama come a un amico.'},
+ {id:'salmo-139-11',autore:'Bibbia',fonte:'Salmo 139,11-12',tipo:'citazione',
+  testo:'Se dico: “Almeno le tenebre mi avvolgano e la luce intorno a me sia notte”, nemmeno le tenebre per te sono tenebre e la notte è luminosa come il giorno; per te le tenebre sono come luce.',
+  notte:'Il buio di questa stanza non è vuoto.'},
+ {id:'seneca-perdono',autore:'Seneca',fonte:'L’ira (De ira) III,36,3',tipo:'citazione',
+  testo:'Quando è stato portato via il lume e mia moglie, che conosce ormai questa mia abitudine, tace, esamino tutta la mia giornata e ripercorro ciò che ho fatto e detto… Posso dirmi: “Bada di non farlo più; per ora ti perdono”.',
+  notte:'Ripassa la giornata e chiudila come Seneca: «per ora ti perdono».'},
+ {id:'evagrio-ira',autore:'Evagrio Pontico',fonte:'Pratico, 21 (su Efesini 4,26)',tipo:'citazione',
+  testo:'Il sole non tramonti sulla nostra ira… Le visioni paurose, infatti, nascono dal turbamento dell’ira.',
+  notte:'C’è un’irritazione di oggi che puoi posare prima di dormire?'},
+ {id:'ignazio-esame-cinque',autore:'Ignazio di Loyola',fonte:'ispirato all’Esame generale, Esercizi spirituali n. 43',tipo:'parafrasi',
+  testo:'Ringrazia per la giornata. Chiedi luce per vederla bene. Ripassala ora per ora, senza processi. Chiedi perdono di ciò che pesa, e affida il domani.',
+  notte:'Cinque passi in cinque respiri: grazie, luce, sguardo, perdono, domani.'},
+ {id:'merton-strada',autore:'Thomas Merton',fonte:'Pensieri nella solitudine (1958), parte II',tipo:'parafrasi',
+  testo:'Non vedo la strada e non so dove porta. Ma il desiderio di fare la tua volontà ti è già gradito: per questo posso fidarmi, anche al buio.',
+  notte:'Affida alla notte la strada che non vedi.'},
+ {id:'rumi-locanda',autore:'Rumi',fonte:'Masnavi V,3644-3646, dalla traduzione di R.A. Nicholson',tipo:'citazione',
+  testo:'Questo corpo, o giovane, è una locanda: ogni mattina arriva di corsa un ospite nuovo. Bada, non dire: “Questo mi pesa”, perché presto tornerà a volare nel non-essere. Qualunque cosa ti venga nel cuore dal mondo invisibile è tuo ospite: trattalo bene.',
+  notte:'Quale ospite è passato oggi dentro di te? Salutalo e lascialo andare.'},
+ {id:'marco-seme',autore:'Bibbia',fonte:'Marco 4,26-27',tipo:'citazione',
+  testo:'Così è il regno di Dio: come un uomo che getta il seme sul terreno; dorma o vegli, di notte o di giorno, il seme germoglia e cresce. Come, egli stesso non lo sa.',
+  notte:'Quello che hai seminato oggi cresce anche mentre dormi.'},
+ {id:'sales-pazienza',autore:'Francesco di Sales',fonte:'lettera a Madame de la Fléchère, 19 maggio 1608',tipo:'citazione',
+  testo:'Abbiate pazienza con tutti, ma soprattutto con voi stessa; voglio dire: non turbatevi per le vostre imperfezioni e abbiate sempre il coraggio di rialzarvi.',
+  notte:'Domani si ricomincia: stasera trattati come un amico stanco.'},
+ {id:'talmud-sogno',autore:'Talmud babilonese',fonte:'Berakhot 55a (Rav Chisda)',tipo:'citazione',
+  testo:'Un sogno non interpretato è come una lettera non letta.',
+  notte:'Se domattina ricordi un sogno, dagli tu una lettura buona.'},
+ {id:'ambrogio-inno',autore:'Ambrogio di Milano',fonte:'inno «Deus creator omnium», ricordato da Agostino, Confessioni IX,12,32',tipo:'citazione',
+  testo:'Dio, creatore di tutte le cose, reggitore del cielo, che vesti il giorno di luce splendente e la notte della grazia del sonno, perché il riposo renda al lavoro le membra sciolte, sollevi le menti stanche e sciolga dal pianto chi è in angoscia.',
+  notte:'Lascia che il sonno sciolga le membra, una per una.'},
+ {id:'salmo-31-6',autore:'Bibbia',fonte:'Salmo 31,6',tipo:'citazione',
+  testo:'Alle tue mani affido il mio spirito; tu mi hai riscattato, Signore, Dio fedele.',
+  notte:'Respirando piano, ripeti dentro di te: «alle tue mani».'},
+ {id:'laozi-radice',autore:'Laozi',fonte:'Tao Te Ching (Daodejing), 16',tipo:'citazione',
+  testo:'Raggiungi il vuoto estremo, custodisci salda la quiete… Ogni cosa torna alla propria radice. Tornare alla radice si chiama quiete.',
+  notte:'Torna alla radice: il respiro, il corpo, il letto.'},
+ {id:'lorenzo-cucina',autore:'Fratel Lorenzo della Risurrezione',fonte:'parole riferite da J. de Beaufort, Costumi (1694)',tipo:'citazione',
+  testo:'Possiedo Dio con la stessa tranquillità nel trambusto della mia cucina, dove a volte più persone mi chiedono insieme cose diverse, che se fossi in ginocchio davanti al Santissimo Sacramento.',
+  notte:'Ripensa al momento più agitato di oggi: anche lì non eri solo.'},
+ {id:'compieta-benedizione',autore:'Compieta',fonte:'Liturgia delle Ore, benedizione finale',tipo:'citazione',
+  testo:'Il Signore ci conceda una notte serena e un riposo tranquillo.',
+  notte:'Augura una notte serena a qualcuno, anche solo col pensiero.'},
+ {id:'hillesum-grazie',autore:'Etty Hillesum',fonte:'lettera da Westerbork, 18 agosto 1943',tipo:'citazione',
+  testo:'Anche la sera, quando sono a letto e riposo in te, mio Dio, a volte mi scorrono sul viso lacrime di gratitudine, e questa è la mia preghiera.',
+  notte:'Lascia salire un grazie, anche senza parole.'},
+ {id:'giovanni-croce-amore',autore:'Giovanni della Croce',fonte:'lettera a María de la Encarnación, 6 luglio 1591',tipo:'citazione',
+  testo:'Non pensi altro se non che tutto lo dispone Dio. E dove non c’è amore, metta amore, e ne trarrà amore.',
+  notte:'Pensa a un rapporto difficile e mettici, stasera, un pensiero buono.'},
+ {id:'salmo-63-7',autore:'Bibbia',fonte:'Salmo 63,7-8',tipo:'citazione',
+  testo:'Quando nel mio letto di te mi ricordo e penso a te nelle veglie notturne, a te che sei stato il mio aiuto, esulto di gioia all’ombra delle tue ali.',
+  notte:'Se ti svegli stanotte, ricorda chi ti ha aiutato.'},
+ {id:'marco-aurelio-presente',autore:'Marco Aurelio',fonte:'Ricordi VIII,36',tipo:'citazione',
+  testo:'Ricordati che non ti pesano né il futuro né il passato, ma sempre il presente; e il presente si rimpicciolisce, se lo isoli da solo.',
+  notte:'Stanotte esiste solo questo respiro. Il resto aspetta domattina.'},
+ {id:'benedetto-silenzio',autore:'Benedetto da Norcia',fonte:'Regola, 42,1',tipo:'citazione',
+  testo:'In ogni tempo i monaci devono coltivare il silenzio, ma soprattutto nelle ore della notte.',
+  notte:'Dopo il respiro, posa il telefono e lascia che il silenzio faccia il resto.'},
+ {id:'salmo-127-2',autore:'Bibbia',fonte:'Salmo 127,2',tipo:'citazione',
+  testo:'Invano vi alzate di buon mattino e tardi andate a riposare, voi che mangiate un pane di fatica: al suo prediletto egli lo darà nel sonno.',
+  notte:'Lascia sul comodino quello che oggi non hai finito.'},
+ {id:'weil-preghiera',autore:'Simone Weil',fonte:'L’ombra e la grazia, «L’attenzione e la volontà»',tipo:'citazione',
+  testo:'L’attenzione, al suo grado più alto, è la stessa cosa della preghiera. Presuppone la fede e l’amore.',
+  notte:'Fai attenzione a tre respiri, solo a quelli.'},
+ {id:'hammarskjold-grazie',autore:'Dag Hammarskjöld',fonte:'Tracce di cammino (Vägmärken), nota del 1953',tipo:'parafrasi',
+  testo:'Alla giornata che finisce, un grazie. A quella che verrà, un sì.',
+  notte:'Prima di dormire: un grazie per oggi, un sì per domani.'},
+];
+const CAMBIO_NOTTE=4;   // fino alle 4 del mattino vale ancora il pensiero della sera prima
+// giorni dal 1/1/1970 secondo la data locale: come il giorno dell'anno, ma senza salti a Capodanno.
+// Il pensiero cambia ogni notte e torna lo stesso solo dopo PENSIERI.length notti.
+function giornoNotte(d=new Date()){
+ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()-(d.getHours()<CAMBIO_NOTTE?1:0));
+ return Math.round(Date.UTC(x.getFullYear(),x.getMonth(),x.getDate())/864e5);
+}
+const indicePensiero=(d=new Date())=>giornoNotte(d)%PENSIERI.length;
+/* ─────────────── PENSIERI: fine ─────────────── */
+
 /* ─────────────── ritmi e testi ─────────────── */
 const RITMI={
  dolce:{nome:'Dolce',in:4,sorso:1.2,out:7},
@@ -934,7 +1225,7 @@ function wakeOff(){const w=P.wake;P.wake=null;if(w){try{Promise.resolve(w.releas
 
 /* ─────────────── schermate ─────────────── */
 function mostra(nome){
- $('sessione').hidden=nome!=='sessione';$('fine').hidden=nome!=='fine';const intro=$('intro');
+ $('pensiero').hidden=nome!=='pensiero';$('sessione').hidden=nome!=='sessione';$('fine').hidden=nome!=='fine';const intro=$('intro');
  if(nome==='intro'){intro.removeAttribute('inert');intro.removeAttribute('aria-hidden');}
  else{intro.setAttribute('inert','');intro.setAttribute('aria-hidden','true');}
  document.documentElement.classList.toggle('chiuso',nome!=='intro');
@@ -950,14 +1241,35 @@ function scriviFase(txt){
  cur.addEventListener('transitionend',()=>{if(cur.style.opacity==='0')cur.textContent='';},{once:true});
 }
 
+/* ─────────────── pensiero della notte ─────────────── */
+// Hook per la voce (non attivo): quando un pensiero avrà il campo audio, qui si potrà riprodurre AUDIO_BASE+p.audio
+function vocePensiero(p){if(!p||!p.audio)return;}
+function apriPensiero(i=indicePensiero()){
+ const p=PENSIERI[i];
+ $('pensNum').textContent=(i+1)+' / '+PENSIERI.length;
+ const t=$('pensTesto'),righe=(p.tipo==='citazione'?'«'+p.testo+'»':p.testo).split('\n');t.textContent='';
+ if(righe.length<2)t.textContent=righe[0];
+ else righe.forEach(r=>{const v=document.createElement('span');v.className='verso';v.textContent=r;t.append(v);});   // versi: chi va a capo rientra
+ const f=$('pensFonte'),b=document.createElement('b');b.textContent=p.autore;f.textContent='';
+ if(p.tipo==='citazione')f.append('— ',b,' · '+p.fonte);
+ else f.append('da ',b,', parafrasi · '+p.fonte);
+ $('pensNotte').textContent=p.notte;
+ mostra('pensiero');$('respira').focus();
+ vocePensiero(p);
+}
+function chiudiPensiero(){if($('pensiero').hidden)return;mostra('intro');render();$('inizia').focus();}
+
 /* ─────────────── sessione ─────────────── */
-async function onInizia(){
- if(P.stato!=='ferma')return;
+function onInizia(){if(P.stato==='ferma')apriPensiero();}
+let _avvio=false;
+async function onRespira(){
+ if(P.stato!=='ferma'||_avvio||$('pensiero').hidden)return;
  sblocca();                                   // nel tocco: audioSession, AudioContext, voce di sistema
  if(S.voce&&statoVoce()==='carico'){          // voce non ancora arrivata: aspetta un attimo, poi parte comunque
-  const b=$('inizia');b.disabled=true;b.textContent='Carico la voce…';
+  const b=$('respira');_avvio=true;b.disabled=true;b.textContent='Carico la voce…';
   await Promise.race([precaricaVoce(),attesa(4000)]);
-  b.disabled=false;render();
+  _avvio=false;b.disabled=false;b.textContent='Respira';
+  if($('pensiero').hidden)return;             // nel frattempo è tornato indietro
  }
  inizia();
 }
@@ -1106,12 +1418,16 @@ $('provaVoce').addEventListener('click',async()=>{   // prova udibile, dentro il
 $('volume').addEventListener('input',e=>{impostaVolume(e.target.value/100);salva();$('volOut').textContent=Math.round(S.volume*100)+'%';});
 $('volume').addEventListener('change',()=>{if(S.suono)tonoBreve(293.66,196);});
 $('inizia').addEventListener('click',onInizia);
+$('respira').addEventListener('click',onRespira);
+$('pensSalta').addEventListener('click',onRespira);
+$('pensIndietro').addEventListener('click',chiudiPensiero);
 $('pausa').addEventListener('click',()=>{if(P.stato==='attiva')pausa();else riprendi();});
 $('stop').addEventListener('click',ferma);
 $('torna').addEventListener('click',tornaIntro);
 $('chip').addEventListener('click',()=>{sblocca();if(S.voce&&statoVoce()!=='pronta')precaricaVoce();setTimeout(()=>controllaAudio(),300);});
 $('azzera').addEventListener('click',()=>{if(confirm('Cancellare tutto il diario da questo browser?')){S.log={};salva();render();}});
 document.addEventListener('keydown',e=>{
+ if(!$('pensiero').hidden){if(e.key==='Escape')chiudiPensiero();return;}
  if($('sessione').hidden)return;
  if(e.key==='Escape')ferma();else if(e.key===' '&&e.target===document.body){e.preventDefault();P.stato==='attiva'?pausa():riprendi();}
 });
@@ -1136,7 +1452,7 @@ if(S.voce)precaricaVoce();   // i file arrivano mentre leggi: quando premi Inizi
 /* hook minimi per i test automatici (nessun effetto sull'uso normale) */
 try{window.__CICLO_TEST={RITMI,SCALA,durCiclo,piano,faseA,faseUI,cueCiclo,geoCiclo,volumeCiclo,flussoCiclo,scalaCiclo,
  livelloCiclo,livelloDaVolume,curveTono,interp,TESTI,P,AU,VOICE,PREP,PAUSA_SORSO,QUOTA_NASO,DUCK,passo,pausa,riprendi,ferma,
- tornaIntro,statistiche,statoVoce,controllaAudio,analizza,disegnaCampo};}catch(e){}
+ tornaIntro,statistiche,statoVoce,controllaAudio,analizza,disegnaCampo,PENSIERI,giornoNotte,indicePensiero,apriPensiero};}catch(e){}
 </script>
 </body>
 </html>
