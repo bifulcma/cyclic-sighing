@@ -49,8 +49,8 @@ h1 i{color:var(--sorso)}
 .parola span{font-size:1.05rem;color:var(--inchiostro);min-height:1.4em;background:rgba(243,238,228,.9);border-radius:999px;padding:.15rem .8rem}
 .parola strong{color:var(--inchiostro);text-shadow:0 0 18px rgba(243,238,228,.9)}
 .parola strong::after{content:'';display:block;height:6px;width:40%;margin:.25rem auto 0;border-radius:6px;background:var(--fc,var(--inchiostro));border:1.5px solid var(--inchiostro)}
-#sess[data-f=naso],#sess[data-f=pausa]{--fc:var(--naso)}#sess[data-f=sorso]{--fc:var(--sorso)}#sess[data-f=bocca]{--fc:var(--bocca)}
-#sess[data-f=out] .parola strong{letter-spacing:.12em;font-style:italic}
+#sess[data-f=naso],#sess[data-f=pausa]{--fc:var(--naso)}#sess[data-f=sorso],#sess[data-f=pausa2]{--fc:var(--sorso)}#sess[data-f=bocca],#sess[data-f=pausa3]{--fc:var(--bocca)}
+#sess[data-f=bocca] .parola strong{letter-spacing:.12em;font-style:italic}
 .basso{display:flex;gap:.6rem;justify-content:center}
 .basso button{min-height:2.9rem;min-width:7.5rem;border-radius:999px;border:1.5px solid var(--inchiostro);background:rgba(255,255,255,.7);font-weight:600}
 .basso .stop{color:#B3122F;border-color:#B3122F}
@@ -113,11 +113,12 @@ h1 i{color:var(--sorso)}
 <script>
 'use strict';
 const $=id=>document.getElementById(id);
-const RITMI={dolce:{n:'Dolce',naso:2,pausa:.3,sorso:.8,bocca:5.6},standard:{n:'Standard',naso:2.5,pausa:.3,sorso:1,bocca:7},lungo:{n:'Lungo',naso:3.5,pausa:.3,sorso:1.2,bocca:9.4}};
+// pause morbide fra OGNI fase: dopo il naso (p1), dopo il sorso (p2), dopo la bocca (p3, polmoni vuoti)
+const RITMI={dolce:{n:'Dolce',naso:2,p1:.6,sorso:.8,p2:.5,bocca:5.6,p3:.9},standard:{n:'Standard',naso:2.5,p1:.6,sorso:1,p2:.6,bocca:7,p3:1},lungo:{n:'Lungo',naso:3.5,p1:.7,sorso:1.2,p2:.7,bocca:9.4,p3:1.2}};
 const DURATE=[2,5,10];
 const GUIDE={muta:'Silenzio',isabella:'Isabella',elsa:'Elsa'};
 const AUDIO='https://raw.githubusercontent.com/bifulcma/cyclic-sighing/0afe6eef074fa7547ac2b88372b30b9d88c2115d/audio/';
-const TXT={naso:['Naso','inspira'],pausa:['Naso','tieni pieno'],sorso:['Sorso','ancora un po’'],bocca:['Bocca','lascia andare, piano']};
+const TXT={naso:['Naso','inspira'],pausa:['Naso','tieni, morbido'],pausa2:['Sorso','tieni pieno'],pausa3:['Bocca','vuoto, riposa'],sorso:['Sorso','ancora un po’'],bocca:['Bocca','lascia andare, piano']};
 const ls=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const STILI={normale:'Naturale',calda:'Calda'};const MEDSEL={si:'Sì',no:'No'};
@@ -156,19 +157,22 @@ function tono(f0,f1,dur){if(!AC)return;const t=AC.currentTime,o=AC.createOscilla
  g.gain.exponentialRampToValueAtTime(.07,t+Math.min(.4,dur/3));g.gain.exponentialRampToValueAtTime(1e-4,t+dur);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+dur+.05)}
 
 /* respiro: livello 0..1, fasi */
+const durL=r=>r.naso+r.p1+r.sorso+r.p2+r.bocca+r.p3;
 function fase(tc,r){
- const a=r.naso,b=a+r.pausa,c=b+r.sorso;const ease=x=>x*x*(3-2*x);
+ const ease=x=>x*x*(3-2*x),a=r.naso,b=a+r.p1,c=b+r.sorso,d=c+r.p2,e=d+r.bocca;
  if(tc<a)return{f:'naso',p:tc/a,v:.75*ease(tc/a)};
- if(tc<b)return{f:'pausa',p:(tc-a)/r.pausa,v:.75};
+ if(tc<b)return{f:'pausa',p:(tc-a)/r.p1,v:.75};
  if(tc<c)return{f:'sorso',p:(tc-b)/r.sorso,v:.75+.25*ease((tc-b)/r.sorso)};
- const p=(tc-c)/r.bocca;return{f:'bocca',p,v:1-ease(p)};
+ if(tc<d)return{f:'pausa2',p:(tc-c)/r.p2,v:1};
+ if(tc<e){const p=(tc-d)/r.bocca;return{f:'bocca',p,v:1-ease(p)}}
+ return{f:'pausa3',p:(tc-e)/r.p3,v:0};
 }
 
 /* il mare: sfondo a tutto schermo */
 const cv=$('mare'),cx=cv.getContext('2d');let W,H,DPR;
 function size(){DPR=Math.min(2,devicePixelRatio||1);W=cv.width=innerWidth*DPR;H=cv.height=innerHeight*DPR}
 addEventListener('resize',size);size();
-const COL={naso:[43,75,255],pausa:[43,75,255],sorso:[255,90,46],bocca:[0,135,106]};
+const COL={naso:[43,75,255],pausa:[43,75,255],pausa2:[255,90,46],pausa3:[0,135,106],sorso:[255,90,46],bocca:[0,135,106]};
 let colNow=[43,75,255],livello=.08,mosso=0,fasePh=0;
 function mare(v,f,dt,energia){
  const tgt=COL[f]||COL.naso;colNow=colNow.map((c,i)=>c+(tgt[i]-c)*Math.min(1,dt*(f==='sorso'?9:5)));
@@ -189,7 +193,7 @@ function mare(v,f,dt,energia){
 const P={on:false,pausa:false,t:0,last:0,tot:0,L:0,r:null,fk:'',raf:0};
 function mostra(n){['intro','med','sess','fine'].forEach(x=>$(x).hidden=x!==n)}
 function inizia(){
- ac();carica();const r=RITMI[S.ritmo];P.r=r;P.L=r.naso+r.pausa+r.sorso+r.bocca;
+ ac();carica();const r=RITMI[S.ritmo];P.r=r;P.L=durL(r);
  P.tot=Math.max(1,Math.round(S.durata*60/P.L))*P.L;P.t=-3;P.on=true;P.pausa=false;P.fk='';P.last=performance.now();
  mostra('sess');voce('intro');$('pausa').textContent='Pausa';$('pausa').focus();P.raf=requestAnimationFrame(loop);
 }
@@ -200,7 +204,7 @@ function loop(now){
  let v=.08,f='naso',e=.15;
  if(P.t<0){$('parola').textContent='Pronto';$('sotto').textContent='mettiti comodo';}
  else{const c=Math.floor(P.t/P.L),x=fase(P.t-c*P.L,P.r);v=x.v;f=x.f;
-  e=f==='pausa'?0:f==='sorso'?1:f==='naso'?.6:.4*(1-x.p)+.1;
+  e=f.startsWith('pausa')?0:f==='sorso'?1:f==='naso'?.6:.4*(1-x.p)+.1;
   const k=c+f;if(k!==P.fk){P.fk=k;$('parola').textContent=TXT[f][0];$('sotto').textContent=TXT[f][1];$('sess').dataset.f=f;
    $('nCiclo').textContent=c+1;
    if(f==='naso'){tono(196,247,P.r.naso);if(c<3)voce('in')}
@@ -236,7 +240,7 @@ $('torna').onclick=()=>{mostra('intro');render();idle()};
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&P.on)P.pausa=true});
 /* in attesa: la marea respira da sola, lenta */
 function idle(){let t0=performance.now(),l=t0;(function f(n){if(P.on)return;const dt=Math.min(.1,(n-l)/1000);l=n;
- const r=RITMI.dolce,L=8.7,x=fase(((n-t0)/1000)%L,r);mare(.08+x.v*.22,x.f,dt,.3);requestAnimationFrame(f)})(t0)}
+ const r=RITMI.dolce,L=durL(r),x=fase(((n-t0)/1000)%L,r);mare(.08+x.v*.22,x.f,dt,.3);requestAnimationFrame(f)})(t0)}
 render();idle();
 window.__MAREA={P,fase,RITMI,chiudi,mare};
 </script>
