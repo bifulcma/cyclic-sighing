@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#F3EEE4">
-<title>Sospiro ciclico · Marea</title>
+<title>Soffio · sospiro ciclico</title>
 <style>
-:root{--carta:#F3EEE4;--inchiostro:#16162A;--grigio:#6A6878;--naso:#2B4BFF;--sorso:#FF5A2E;--bocca:#00876A;--sorsoT:#C23A12;--boccaT:#00705A;
+:root{--carta:#F3EEE4;--pannello:rgba(243,238,228,.94);--pannello2:rgba(255,255,255,.55);--testo2:#3d3c4e;--attivo2:#cfcbe0;--stop:#B3122F;--linea:rgba(22,22,42,.2);--vai:var(--sorso);--vaiT:var(--inchiostro);--inchiostro:#16162A;--grigio:#6A6878;--naso:#2B4BFF;--sorso:#FF5A2E;--bocca:#00876A;--sorsoT:#C23A12;--boccaT:#00705A;
  --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;--sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
  --mono:ui-monospace,Menlo,Consolas,monospace}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -22,48 +22,58 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 h1{font-family:var(--serif);font-weight:400;font-size:3.1rem;line-height:.9;letter-spacing:-.03em;margin-top:.6rem}
 h1 i{color:var(--sorsoT)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.avv{font-size:.8rem;color:var(--inchiostro);text-align:center;margin:.2rem 0 .5rem;position:relative;background:rgba(243,238,228,.94);border-radius:999px;padding:.2rem .6rem}
-.lead{margin-top:1rem;font-size:1.02rem;line-height:1.5;color:#3d3c4e}
+.avv{font-size:.8rem;color:var(--inchiostro);text-align:center;margin:.2rem 0 .5rem;position:relative;background:var(--pannello);border-radius:999px;padding:.2rem .6rem}
+.lead{margin-top:1rem;font-size:1.02rem;line-height:1.5;color:var(--testo2)}
 .tre{display:grid;grid-template-columns:1fr 1fr 2fr;gap:.4rem;margin-top:1.3rem}
-.tre div{border:1.5px solid var(--inchiostro);border-radius:14px;padding:.55rem .6rem;background:rgba(255,255,255,.55)}
+.tre div{border:1.5px solid var(--inchiostro);border-radius:14px;padding:.55rem .6rem;background:var(--pannello2)}
 .tre b{display:block;font-family:var(--serif);font-size:1.25rem;font-weight:400}
 .tre small{font-size:.72rem;color:var(--grigio);line-height:1.25;display:block}
 .tre div:nth-child(1) b{color:var(--naso)}.tre div:nth-child(2) b{color:var(--sorsoT)}.tre div:nth-child(3) b{color:var(--boccaT)}
 .lbl{font-family:var(--mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--grigio);margin:1.2rem 0 .45rem}
 .seg{display:flex;gap:.4rem}
-.seg button{flex:1;min-width:0;min-height:2.9rem;border:1.5px solid var(--inchiostro);border-radius:999px;font-weight:600;font-size:.9rem;background:rgba(255,255,255,.5)}
+.seg button{flex:1;min-width:0;min-height:2.9rem;border:1.5px solid var(--inchiostro);border-radius:999px;font-weight:600;font-size:.9rem;background:var(--pannello2)}
 .seg button small{display:block;font-weight:400;font-size:.7rem;font-family:var(--mono);color:var(--grigio)}
 .seg button[aria-pressed=true]{background:var(--inchiostro);color:var(--carta)}
-.seg button[aria-pressed=true] small{color:#cfcbe0}
-.diario{position:relative;background:rgba(243,238,228,.94);border:1px solid rgba(22,22,42,.2);border-radius:12px;padding:.3rem .7rem;margin-top:1.1rem;display:flex;gap:.5rem;align-items:center;font-size:.85rem;color:var(--grigio)}
+.seg button[aria-pressed=true] small{color:var(--attivo2)}
+.diario{position:relative;background:var(--pannello);border:1px solid var(--linea);border-radius:12px;padding:.3rem .7rem;margin-top:1.1rem;display:flex;gap:.5rem;align-items:center;font-size:.85rem;color:var(--grigio)}
 .diario b{font-family:var(--serif);font-size:1.6rem;font-weight:400;color:var(--inchiostro)}
 .punti{display:flex;gap:4px;margin-left:auto}
-.punti i{width:10px;height:10px;border-radius:50%;border:1px solid #b9b1a0}
+.punti i{width:10px;height:10px;border-radius:50%;border:1px solid var(--grigio)}
 .punti i.on{background:var(--bocca);border-color:var(--bocca)}
 .spazio{flex:1;min-height:.8rem}
-.vai{width:100%;min-height:3.4rem;border-radius:999px;border:1.5px solid var(--inchiostro);background:var(--sorso);font-weight:700;font-size:1.05rem;box-shadow:3px 3px 0 var(--inchiostro)}
-.nota{position:relative;font-size:.78rem;color:var(--inchiostro);margin-top:.8rem;line-height:1.45;background:rgba(243,238,228,.94);border:1px solid rgba(22,22,42,.25);border-radius:12px;padding:.55rem .7rem}
+.vai{width:100%;min-height:3.4rem;border-radius:999px;border:1.5px solid var(--inchiostro);background:var(--vai);color:var(--vaiT);font-weight:700;font-size:1.05rem;box-shadow:3px 3px 0 var(--inchiostro)}
+.nota{position:relative;font-size:.78rem;color:var(--inchiostro);margin-top:.8rem;line-height:1.45;background:var(--pannello);border:1px solid var(--linea);border-radius:12px;padding:.55rem .7rem}
 /* sessione */
 #sess .alto{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase}
 .parola{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.4rem}
 .parola strong{font-family:var(--serif);font-weight:400;font-size:clamp(4rem,22vw,6.2rem);line-height:1;letter-spacing:-.02em;
  transition:letter-spacing 1.2s ease}
 .parola span.vuoto{opacity:0}
-.parola span{font-size:1.05rem;color:var(--inchiostro);min-height:1.4em;background:rgba(243,238,228,.9);border-radius:14px;padding:.15rem .8rem}
-.parola strong{color:var(--inchiostro);text-shadow:0 0 18px rgba(243,238,228,.9)}
+.parola span{font-size:1.05rem;color:var(--inchiostro);min-height:1.4em;background:var(--pannello);border-radius:14px;padding:.15rem .8rem}
+.parola strong{color:var(--inchiostro);text-shadow:0 0 18px var(--pannello)}
 #sess .parola strong::after{content:'';display:block;height:6px;width:40%;margin:.25rem auto 0;border-radius:6px;background:var(--fc,var(--inchiostro));border:1.5px solid var(--inchiostro)}
 #sess[data-f=naso],#sess[data-f=pausa]{--fc:var(--naso)}#sess[data-f=sorso],#sess[data-f=pausa2]{--fc:var(--sorso)}#sess[data-f=bocca],#sess[data-f=pausa3]{--fc:var(--bocca)}
 /* la parola non cambia stile fra le fasi (prima il corsivo/spaziatura di «Bocca» saltava nella pausa a vuoto): cambia solo il testo, in dissolvenza */
 .parola strong,.parola span{transition:opacity .12s ease}
 #sess .parola strong::after{transition:background-color .4s ease}
 .basso{display:flex;gap:.6rem;justify-content:center}
-.basso button{min-height:2.9rem;min-width:7.5rem;border-radius:999px;border:1.5px solid var(--inchiostro);background:rgba(255,255,255,.7);font-weight:600}
-.basso .stop{color:#B3122F;border-color:#B3122F}
-.barra{height:4px;border-radius:4px;background:rgba(22,22,42,.12);margin:.8rem 0 1rem;overflow:hidden}
+.basso button{min-height:2.9rem;min-width:7.5rem;border-radius:999px;border:1.5px solid var(--inchiostro);background:var(--pannello2);font-weight:600}
+.basso .stop{color:var(--stop);border-color:var(--stop)}
+.barra{height:4px;border-radius:4px;background:var(--linea);margin:.8rem 0 1rem;overflow:hidden}
 .barra div{height:100%;width:0;background:var(--inchiostro)}
 #fine .parola strong{font-size:clamp(2.6rem,13vw,3.6rem)}
 #med h2{font-family:var(--serif);font-weight:400;font-size:2.2rem;line-height:1.05;margin:.5rem 0 1rem}
-#med #mX{font-family:var(--serif);font-size:1.12rem;line-height:1.6;background:rgba(243,238,228,.9);border-radius:16px;padding:.9rem 1rem;border:1px solid rgba(22,22,42,.18)}
+#med #mX{font-family:var(--serif);font-size:1.12rem;line-height:1.6;background:var(--pannello);border-radius:16px;padding:.9rem 1rem;border:1px solid var(--linea)}
+/* Notte: carta calda scura, acqua spenta, niente colori accesi */
+html[data-tema=notte]{--carta:#1C1916;--inchiostro:#C4B9A8;--grigio:#9E9280;--testo2:#B8AD9C;--naso:#6F7DB0;--sorso:#B07E6A;--bocca:#6E9585;
+ --sorsoT:#D49C86;--boccaT:#8FBBA9;--pannello:rgba(36,32,28,.94);--pannello2:rgba(255,240,220,.05);--attivo2:#4A443C;--stop:#D9938A;--linea:rgba(216,205,189,.22);
+ --vai:#5E4A3E;--vaiT:#EDE3D4;color-scheme:dark}
+html[data-tema=notte] .seg button[aria-pressed=true]{background:#4A4036;color:#E6DCCB;border-color:#C4B9A8}
+html[data-tema=notte] .seg button[aria-pressed=true] small{color:#C9BEAD}
+html[data-tema=notte] .vai{box-shadow:3px 3px 0 #000}
+html[data-tema=notte] .tre div:nth-child(1) b{color:#9FAEE0}
+html[data-tema=notte] .parola strong{text-shadow:0 0 18px rgba(28,25,22,.9)}
+body{transition:background-color .6s ease}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -71,8 +81,8 @@ h1 i{color:var(--sorsoT)}
 <canvas id="mare" aria-hidden="true"></canvas>
 
 <main id="intro" class="vista">
- <p class="occhiello">Cyclic sighing · marea</p>
- <h1>Sospiro<br><i>ciclico</i></h1>
+ <p class="occhiello">Sospiro ciclico · cyclic sighing</p>
+ <h1>Soff<i>io</i></h1>
  <p class="lead">Lo sfondo è il tuo respiro: la marea sale col naso, sale ancora con un secondo breve respiro dal naso, poi si ritira piano dalla bocca. Segui l'acqua.</p>
  <div class="tre" aria-label="Le tre fasi">
   <div><b>Naso</b><small>inspira</small></div>
@@ -85,6 +95,8 @@ h1 i{color:var(--sorsoT)}
  <div class="seg" role="group" aria-labelledby="lR" id="ritmi"></div>
  <p class="lbl" id="lV">Guida</p>
  <div class="seg" role="group" aria-labelledby="lV" id="guide"></div>
+ <p class="lbl" id="lT">Luce</p>
+ <div class="seg" role="group" aria-labelledby="lT" id="temi"></div>
  <p class="lbl" id="lM">Meditazione del giorno, prima del respiro</p>
  <div class="seg" role="group" aria-labelledby="lM" id="medsel"></div>
  <div class="diario"><b id="serie">0</b><span id="serieTxt">giorni di fila</span><div class="punti" id="punti" aria-hidden="true"></div></div>
@@ -144,9 +156,13 @@ seg('durate',Object.fromEntries(DURATE.map(d=>[d,d])),'durata',k=>k+' min');
 seg('ritmi',RITMI,'ritmo',k=>{const r=RITMI[k];return `${r.n}<small>${r.naso}+${r.sorso}+${r.bocca} s</small>`});
 seg('guide',GUIDE,'guida',k=>GUIDE[k]);
 seg('medsel',MEDSEL,'med',k=>MEDSEL[k]);
+seg('temi',{giorno:'Giorno',notte:'Notte'},'tema',k=>k==='giorno'?'Giorno':'Notte');
+// tema: scelto dall'utente, altrimenti Notte dalle 21 alle 7
+const temaOra=()=>S.tema||((h=>h>=21||h<7)(new Date().getHours())?'notte':'giorno');
+function applicaTema(){const t=temaOra();document.documentElement.dataset.tema=t;document.querySelector('meta[name=theme-color]').content=t==='notte'?'#1C1916':'#F3EEE4';PAL=t==='notte'?PAL_N:PAL_G}
 function serie(){let o=LOG[dIso(0)]?0:-1,n=0;while(LOG[dIso(o)]){n++;o--}return n}
-function render(){
- document.querySelectorAll('[data-k]').forEach(b=>{const p=b.parentNode.id,v={durate:S.durata,ritmi:S.ritmo,guide:S.guida,medsel:S.med}[p];b.setAttribute('aria-pressed',String(b.dataset.k==String(v)))});
+function render(){applicaTema();
+ document.querySelectorAll('[data-k]').forEach(b=>{const p=b.parentNode.id,v={temi:temaOra(),durate:S.durata,ritmi:S.ritmo,guide:S.guida,medsel:S.med}[p];b.setAttribute('aria-pressed',String(b.dataset.k==String(v)))});
  const n=serie();$('serie').textContent=n;$('serieTxt').textContent=n===1?'giorno di fila':'giorni di fila';
  let h='';for(let i=6;i>=0;i--)h+=`<i class="${LOG[dIso(-i)]?'on':''}"></i>`;$('punti').innerHTML=h;
  $('vai').textContent='Inizia · '+S.durata+' min';
@@ -181,7 +197,12 @@ function fase(tc,r){
 const cv=$('mare'),cx=cv.getContext('2d');let W,H,DPR;
 function size(){DPR=Math.min(2,devicePixelRatio||1);W=cv.width=innerWidth*DPR;H=cv.height=innerHeight*DPR}
 addEventListener('resize',size);size();
-const COL={naso:[43,75,255],pausa:[43,75,255],pausa2:[255,90,46],pausa3:[0,135,106],sorso:[255,90,46],bocca:[0,135,106]};
+const COL_G={naso:[43,75,255],pausa:[43,75,255],pausa2:[255,90,46],pausa3:[0,135,106],sorso:[255,90,46],bocca:[0,135,106]};
+const COL_N={naso:[95,108,160],pausa:[95,108,160],pausa2:[150,105,88],pausa3:[90,125,112],sorso:[150,105,88],bocca:[90,125,112]};
+const PAL_G={col:COL_G,linea:'rgba(22,22,42,.85)',grid:'rgba(22,22,42,.08)',a0:.16,da:.08};
+const PAL_N={col:COL_N,linea:'rgba(216,205,189,.35)',grid:'rgba(216,205,189,.05)',a0:.14,da:.06};
+let PAL=PAL_G;
+const COL=new Proxy({},{get:(o,k)=>PAL.col[k]});
 let colNow=[43,75,255],livello=.08,mosso=0,fasePh=0;
 function mare(v,f,dt,energia){
  const tgt=COL[f]||COL.naso;colNow=colNow.map((c,i)=>c+(tgt[i]-c)*Math.min(1,dt*(f==='sorso'?9:5)));
@@ -191,10 +212,10 @@ function mare(v,f,dt,energia){
  for(let k=0;k<4;k++){const amp=(rid?0:(6+18*mosso)*DPR)*(1-k*.2),y0=base+k*H*.035;
   cx.beginPath();cx.moveTo(0,H);
   const st=8*DPR;for(let i=0;i<=Math.ceil(W/st);i++){const x=Math.min(W,i*st),y=y0+Math.sin(x/W*Math.PI*(2+k)+fasePh*(1+k*.3))*amp+Math.sin(x/W*9+fasePh*1.7)*amp*.3;cx.lineTo(x,y)}
-  cx.lineTo(W,H);cx.closePath();cx.fillStyle=`rgba(${c[0]},${c[1]},${c[2]},${.16+k*.08})`;cx.fill();
-  if(k===0){cx.strokeStyle='rgba(22,22,42,.85)';cx.lineWidth=2*DPR;cx.stroke()}}
+  cx.lineTo(W,H);cx.closePath();cx.fillStyle=`rgba(${c[0]},${c[1]},${c[2]},${PAL.a0+k*PAL.da})`;cx.fill();
+  if(k===0){cx.strokeStyle=PAL.linea;cx.lineWidth=2*DPR;cx.stroke()}}
  // linee di marea (scala)
- cx.strokeStyle='rgba(22,22,42,.08)';cx.lineWidth=1*DPR;
+ cx.strokeStyle=PAL.grid;cx.lineWidth=1*DPR;
  for(let i=1;i<10;i++){const y=H*(.92-.72*i/9);cx.beginPath();cx.moveTo(0,y);cx.lineTo(W,y);cx.stroke()}
 }
 
